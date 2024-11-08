@@ -1,4 +1,4 @@
-name: Publish Dependencies Package
+name: Publish com.chopsticks.dependencies
 
 on:
   push:
