@@ -1,0 +1,14 @@
+{
+	"name": "Chopsticks.Dependencies.Editor.Tests",
+	"references": [
+		"Chopsticks.Dependencies.Editor",
+		"Chopsticks.Dependencies"
+	],
+	"optionalUnityReferences":[
+		"TestAssemblies"
+	],
+	"includePlatforms": [
+		"Editor"
+	],
+	"excludePlatforms": []
+}
