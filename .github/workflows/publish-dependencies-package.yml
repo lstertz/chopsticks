@@ -70,7 +70,7 @@ jobs:
           mv $TEMP_DEPLOYMENT_DIR/* .
           
           git add .
-          git commit -m "Update package branch to version ${{ env.version }}"
+          git commit -m "Update package to version ${{ env.version }}"
           
           git remote set-url origin "https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
           git push --set-upstream origin $PACKAGE_BRANCH --force
