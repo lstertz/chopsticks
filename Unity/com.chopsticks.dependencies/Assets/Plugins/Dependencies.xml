@@ -4,6 +4,21 @@
         <name>Dependencies</name>
     </assembly>
     <members>
+        <member name="T:Chopsticks.Dependencies.Containers.IDependencyContainer">
+            <summary>
+            Manages the registration and containment of dependencies, 
+            providing localized resolution while controlling dependency scope
+            and accessibility.
+            </summary>
+        </member>
+        <member name="T:Chopsticks.Dependencies.Dependency`1">
+            <summary>
+            Wraps a contract type to accommodate dynamic runtime fulfillment 
+            for its dependents.
+            </summary>
+            <typeparam name="TContract">The type of the contract that 
+            will be fulfilled as a dependency.</typeparam>
+        </member>
         <member name="T:System.Diagnostics.CodeAnalysis.SetsRequiredMembersAttribute">
             <summary>
             Specifies that this constructor sets all required members for the current type, and callers
