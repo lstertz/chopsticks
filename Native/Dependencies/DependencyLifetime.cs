@@ -7,8 +7,7 @@
     {
         /// <summary>
         /// A new singleton dependency will be instantiated for each container in which 
-        /// it is resolved, regardless of whether the container specifies that it 
-        /// should inherit dependencies of its parent containers.
+        /// it is resolved.
         /// </summary>
         Contained,
         /// <summary>

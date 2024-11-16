@@ -11,9 +11,19 @@ namespace Chopsticks.Dependencies.Containers
     /// </summary>
     public interface IDependencyContainer
     {
+        /// <summary>
+        /// Specifies whether this container should inherit all of its parent container's 
+        /// registered dependencies.
+        /// </summary>
         bool InheritParentDependencies { get; }
 
-        IDependencyContainer Parent { get; set; }
+        /// <summary>
+        /// The parent container of this container.
+        /// </summary>
+        /// <remarks>
+        /// This is null if this container has no parent container.
+        /// </remarks>
+        IDependencyContainer? Parent { get; set; }
 
 
         /// <summary>
@@ -60,5 +70,13 @@ namespace Chopsticks.Dependencies.Containers
         /// implementation type or the contract type that would be resolved.</param>
         /// <returns>The collection of all resolving implementations..</returns>
         IEnumerable<object> ResolveAll(Type dependencyType);
+
+        /// <summary>
+        /// Resolves all dependencies that will be singletons within the scope of this container, 
+        /// which will include those registered with a lifetime of either
+        /// <see cref="DependencyLifetime.Singleton"/> or 
+        /// <see cref="DependencyLifetime.Contained"/>.
+        /// </summary>
+        void ResolveAllSingletons();
     }
 }
