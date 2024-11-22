@@ -3,13 +3,17 @@ using System.Collections.Generic;
 
 namespace Chopsticks.Dependencies.Containers
 {
+    /// <inheritdoc cref="IDependencyContainer"/>
     public class DependencyContainer : IDependencyContainer
     {
         /// <inheritdoc/>
-        public bool InheritParentDependencies { get; init; }
+        public bool InheritParentDependencies { get; set; }
 
         /// <inheritdoc/>
-        public IDependencyContainer Parent { get; set; }
+        public IDependencyContainer? Parent { get; set; }
+
+
+        // TODO :: Track specifications and their factories, and/or resulting instances.
 
 
         public DependencyContainer()
@@ -24,6 +28,7 @@ namespace Chopsticks.Dependencies.Containers
             throw new NotImplementedException();
         }
 
+
         /// <inheritdoc/>
         public IDependencyContainer Deregister(DependencySpecification specification)
         {
@@ -32,6 +37,14 @@ namespace Chopsticks.Dependencies.Containers
 
         /// <inheritdoc/>
         public IDependencyContainer Register(DependencySpecification specification)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        /// <inheritdoc/>
+        public object AssertiveResolve(Type dependencyType, 
+            string? customErrorMessage = null)
         {
             throw new NotImplementedException();
         }
@@ -51,7 +64,7 @@ namespace Chopsticks.Dependencies.Containers
         /// <inheritdoc/>
         public void ResolveAllSingletons()
         {
-
+            throw new NotImplementedException();
         }
     }
 }

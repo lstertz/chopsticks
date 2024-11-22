@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections;
+﻿using Chopsticks.Dependencies.Exceptions;
+using System;
 using System.Collections.Generic;
 
 namespace Chopsticks.Dependencies.Containers
 {
     /// <summary>
     /// Manages the registration and containment of dependencies, 
-    /// providing localized resolution while controlling dependency scope
+    /// providing localized resolution while accounting for dependency scope
     /// and accessibility.
     /// </summary>
     public interface IDependencyContainer
@@ -15,7 +15,7 @@ namespace Chopsticks.Dependencies.Containers
         /// Specifies whether this container should inherit all of its parent container's 
         /// registered dependencies.
         /// </summary>
-        bool InheritParentDependencies { get; }
+        bool InheritParentDependencies { get; set; }
 
         /// <summary>
         /// The parent container of this container.
@@ -35,6 +35,7 @@ namespace Chopsticks.Dependencies.Containers
         /// for the identified dependency.</returns>
         bool Contains(Type dependencyType);
 
+
         /// <summary>
         /// Deregisters the dependency defined by the given specification.
         /// </summary>
@@ -50,6 +51,20 @@ namespace Chopsticks.Dependencies.Containers
         /// dependency to be registered.</param>
         /// <returns>This container, to chain additional manipulations.</returns>
         IDependencyContainer Register(DependencySpecification specification);
+
+
+        /// <summary>
+        /// Resolves the dependency of the specified type with the 
+        /// first registered implementation.
+        /// </summary>
+        /// <param name="dependencyType">The type of the dependency, either as the 
+        /// implementation type or the contract type that would be resolved.</param>
+        /// <param name="customErrorMessage">The custom message of the exception 
+        /// thrown if the dependency could not be resolved.</param>
+        /// <exception cref="MissingDependencyException">Thrown if the specified 
+        /// dependency could not be resolved.</exception>
+        /// <returns>The resolved dependency.</returns>
+        object AssertiveResolve(Type dependencyType, string? customErrorMessage = null);
 
         /// <summary>
         /// Resolves the dependency of the specified type with the 
