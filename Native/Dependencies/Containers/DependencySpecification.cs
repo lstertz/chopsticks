@@ -31,7 +31,7 @@ namespace Chopsticks.Dependencies.Containers
         /// The factory method that can produce an instance of the <see cref="Implementation"/> to 
         /// resolve this dependency.
         /// </summary>
-        public required Func<IDependencyContainer, object?> ImplementationFactory { get; init; }
+        public required Func<IDependencyContainer, object> ImplementationFactory { get; init; }
 
 
         /// <summary>

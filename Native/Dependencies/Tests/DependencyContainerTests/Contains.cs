@@ -27,11 +27,12 @@ public class Contains
         };
 
         // Act
-        container.Register(spec);
-        container.Deregister(spec);
+        container.Register(spec)
+            .Deregister(spec);
+        var contains = container.Contains(spec.Contract);
 
         // Assert
-        Assert.That(container.Contains(spec.Contract), Is.False);
+        Assert.That(contains, Is.False);
     }
 
     [Test]
@@ -47,11 +48,12 @@ public class Contains
         };
 
         // Act
-        container.Register(spec);
-        container.Deregister(spec);
+        container.Register(spec)
+            .Deregister(spec);
+        var contains = container.Contains(spec.Implementation);
 
         // Assert
-        Assert.That(container.Contains(spec.Implementation), Is.False);
+        Assert.That(contains, Is.False);
     }
 
 
@@ -75,9 +77,10 @@ public class Contains
 
         // Act
         parentContainer.Register(spec);
+        var contains = childContainer.Contains(spec.Contract);
 
         // Assert
-        Assert.That(childContainer.Contains(spec.Contract), Is.True);
+        Assert.That(contains, Is.True);
     }
 
     [Test]
@@ -100,9 +103,10 @@ public class Contains
 
         // Act
         parentContainer.Register(spec);
+        var contains = childContainer.Contains(typeof(Mock.IContractB));
 
         // Assert
-        Assert.That(childContainer.Contains(typeof(Mock.IContractB)), Is.False);
+        Assert.That(contains, Is.False);
     }
 
     [Test]
@@ -125,9 +129,10 @@ public class Contains
 
         // Act
         parentContainer.Register(spec);
+        var contains = childContainer.Contains(spec.Contract);
 
         // Assert
-        Assert.That(childContainer.Contains(spec.Contract), Is.False);
+        Assert.That(contains, Is.False);
     }
 
 
@@ -145,9 +150,10 @@ public class Contains
 
         // Act
         container.Register(spec);
+        var contains = container.Contains(spec.Implementation);
 
         // Assert
-        Assert.That(container.Contains(spec.Implementation), Is.False);
+        Assert.That(contains, Is.False);
     }
 
     [Test]
@@ -164,9 +170,10 @@ public class Contains
 
         // Act
         container.Register(spec);
+        var contains = container.Contains(typeof(Mock.IContractB));
 
         // Assert
-        Assert.That(container.Contains(typeof(Mock.IContractB)), Is.False);
+        Assert.That(contains, Is.False);
     }
 
     [Test]
@@ -183,9 +190,10 @@ public class Contains
 
         // Act
         container.Register(spec);
+        var contains = container.Contains(spec.Contract);
 
         // Assert
-        Assert.That(container.Contains(spec.Contract), Is.True);
+        Assert.That(contains, Is.True);
     }
 
     [Test]
@@ -195,16 +203,17 @@ public class Contains
         DependencyContainer container = new();
         DependencySpecification spec = new()
         {
-            Contract = typeof(Mock.IContractA),
+            Contract = typeof(Mock.ImplementationA),
             Implementation = typeof(Mock.ImplementationA),
             ImplementationFactory = _ => new()
         };
 
         // Act
         container.Register(spec);
+        var contains = container.Contains(typeof(Mock.IContractA));
 
         // Assert
-        Assert.That(container.Contains(spec.Contract), Is.False);
+        Assert.That(contains, Is.False);
     }
 
     [Test]
@@ -214,15 +223,16 @@ public class Contains
         DependencyContainer container = new();
         DependencySpecification spec = new()
         {
-            Contract = typeof(Mock.IContractA),
+            Contract = typeof(Mock.ImplementationA),
             Implementation = typeof(Mock.ImplementationA),
             ImplementationFactory = _ => new()
         };
 
         // Act
         container.Register(spec);
+        var contains = container.Contains(spec.Implementation);
 
         // Assert
-        Assert.That(container.Contains(spec.Implementation), Is.True);
+        Assert.That(contains, Is.True);
     }
 }

@@ -4,8 +4,40 @@ using System.Collections.Generic;
 namespace Chopsticks.Dependencies.Containers
 {
     /// <inheritdoc cref="IDependencyContainer"/>
-    public class DependencyContainer : IDependencyContainer
+    public class DependencyContainer : IDependencyContainer, IDisposable
     {
+        /// <summary>
+        /// Resolves, and maintains resolved implementation instances of, the dependency 
+        /// specified by the provided dependency specification.
+        /// </summary>
+        /// <param name="specification">The spec that defines the dependency that is 
+        /// resolved and maintained by this resolution.</param>
+        private abstract class Resolution(DependencySpecification specification) : IDisposable
+        {
+            protected DependencySpecification Specification { get; init; } = specification;
+
+            public abstract void Dispose();
+        }
+
+        private class SingletonResolution(DependencySpecification specification) : 
+            Resolution(specification)
+        {
+            public bool IsContained => Specification.Lifetime == DependencyLifetime.Contained;
+
+            public override void Dispose()
+            {
+            }
+        }
+
+        private class TransientResolution(DependencySpecification specification) :
+            Resolution(specification)
+        {
+            public override void Dispose()
+            {
+            }
+        }
+
+
         /// <inheritdoc/>
         public bool InheritParentDependencies { get; set; }
 
@@ -13,37 +45,67 @@ namespace Chopsticks.Dependencies.Containers
         public IDependencyContainer? Parent { get; set; }
 
 
-        // TODO :: Track specifications and their factories, and/or resulting instances.
+        /// <summary>
+        /// A mapping of contract types to all resolutions for each contract.
+        /// </summary>
+        private readonly Dictionary<Type, List<Resolution>> _resolutions = [];
 
 
-        public DependencyContainer()
+        /// <inheritdoc/>
+        public void Dispose()
         {
-
+            throw new NotImplementedException();
         }
 
 
         /// <inheritdoc/>
         public bool Contains(Type dependencyType)
         {
-            throw new NotImplementedException();
+            if (InheritParentDependencies && Parent?.Contains(dependencyType) == true)
+                return true;
+
+            return _resolutions.ContainsKey(dependencyType);
         }
 
 
         /// <inheritdoc/>
         public IDependencyContainer Deregister(DependencySpecification specification)
         {
-            throw new NotImplementedException();
+            if (!_resolutions.ContainsKey(specification.Contract))
+                return this;
+
+            var resolution = _resolutions[specification.Contract][0];
+            resolution.Dispose();
+
+            _resolutions[specification.Contract].RemoveAt(0);
+            if (_resolutions[specification.Contract].Count == 0)
+                _resolutions.Remove(specification.Contract);
+
+            return this;
         }
 
         /// <inheritdoc/>
         public IDependencyContainer Register(DependencySpecification specification)
         {
-            throw new NotImplementedException();
+            Resolution resolution = specification.Lifetime switch
+            {
+                DependencyLifetime.Contained => new SingletonResolution(specification),
+                DependencyLifetime.Singleton => new SingletonResolution(specification),
+                DependencyLifetime.Transient => new TransientResolution(specification),
+                _ => throw new NotImplementedException($"The lifetime of " +
+                    $"{specification.Lifetime} is not supported.")
+            };
+
+            if (_resolutions.TryAdd(specification.Contract, [resolution]))
+                return this;
+
+            _resolutions[specification.Contract].Add(resolution);
+            return this;
         }
 
 
         /// <inheritdoc/>
-        public object AssertiveResolve(Type dependencyType, 
+        public object AssertiveResolve(Type dependencyType,
             string? customErrorMessage = null)
         {
             throw new NotImplementedException();
