@@ -19,11 +19,17 @@ namespace Chopsticks.Dependencies.Containers
             public abstract void Dispose();
         }
 
+        private class ContainedResolution(DependencySpecification specification) :
+            Resolution(specification)
+        {
+            public override void Dispose()
+            {
+            }
+        }
+
         private class SingletonResolution(DependencySpecification specification) : 
             Resolution(specification)
         {
-            public bool IsContained => Specification.Lifetime == DependencyLifetime.Contained;
-
             public override void Dispose()
             {
             }
@@ -89,7 +95,7 @@ namespace Chopsticks.Dependencies.Containers
         {
             Resolution resolution = specification.Lifetime switch
             {
-                DependencyLifetime.Contained => new SingletonResolution(specification),
+                DependencyLifetime.Contained => new ContainedResolution(specification),
                 DependencyLifetime.Singleton => new SingletonResolution(specification),
                 DependencyLifetime.Transient => new TransientResolution(specification),
                 _ => throw new NotImplementedException($"The lifetime of " +
@@ -127,6 +133,34 @@ namespace Chopsticks.Dependencies.Containers
         public void ResolveAllSingletons()
         {
             throw new NotImplementedException();
+        }
+
+
+        /// <summary>
+        /// Provides the first resolution for the specified dependency type.
+        /// </summary>
+        /// <param name="dependencyType">The type of the dependency, either as the 
+        /// implementation type or the contract type.</param>
+        /// <returns>The first resolution for the specified dependency type, 
+        /// or null if there is no such known resolution.</returns>
+        private Resolution? GetResolution(Type dependencyType)
+        {
+            // TODO :: Find the local resolution first, then check parent's resolutions.
+            // TODO :: If the resolution is Contained, cache it as a local resolution during resolving.
+            return null;
+        }
+
+        /// <summary>
+        /// Provides all resolutions for the specified dependency type.
+        /// </summary>
+        /// <param name="dependencyType">The type of the dependency, either as the 
+        /// implementation type or the contract type.</param>
+        /// <returns>All resolutions for the specified dependency type.</returns>
+        private IEnumerable<Resolution> GetResolutions(Type dependencyType)
+        {
+            // TODO :: Find the local resolution first, then join with unique parent's resolutions.
+            // TODO :: If any resolution is Contained, cache it as a local resolution during resolving.
+            return [];
         }
     }
 }
