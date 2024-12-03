@@ -14,6 +14,8 @@ public class Contains
     }
 
 
+    // TODO :: Add Deregistration tests for validating cases with multiple registrations.
+    
     [Test]
     public void Contains_DeregisteredContractedImplementation_FalseForContract()
     {

@@ -80,6 +80,9 @@ namespace Chopsticks.Dependencies.Containers
             if (!_resolutions.ContainsKey(specification.Contract))
                 return this;
 
+            // TODO :: Deregistration needs to be more accommodating, for example, to deregister 
+            //          a specific singleton.
+
             var resolution = _resolutions[specification.Contract][0];
             resolution.Dispose();
 
