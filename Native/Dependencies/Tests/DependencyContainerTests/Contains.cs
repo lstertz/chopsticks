@@ -14,8 +14,6 @@ public class Contains
     }
 
 
-    // TODO :: Add Deregistration tests for validating cases with multiple registrations.
-    
     [Test]
     public void Contains_DeregisteredContractedImplementation_FalseForContract()
     {
@@ -56,6 +54,90 @@ public class Contains
 
         // Assert
         Assert.That(contains, Is.False);
+    }
+
+    [Test]
+    public void Contains_DeregisteredMultipleAfterMultipleRegistrations_True()
+    {
+        // Set up
+        DependencyContainer container = new();
+        DependencySpecification spec1 = new()
+        {
+            Contract = typeof(Mock.IContractA),
+            Implementation = typeof(Mock.ImplementationA),
+            ImplementationFactory = _ => new()
+        };
+        DependencySpecification spec2 = new()
+        {
+            Contract = typeof(Mock.IContractA),
+            Implementation = typeof(Mock.ImplementationA),
+            ImplementationFactory = _ => new()
+        };
+
+        // Act
+        container.Register(spec1)
+            .Register(spec2)
+            .Deregister(spec1)
+            .Deregister(spec2);
+        var contains = container.Contains(spec2.Contract);
+
+        // Assert
+        Assert.That(contains, Is.False);
+    }
+
+    [Test]
+    public void Contains_DeregisteredSingleAfterMultipleRegistrations_True()
+    {
+        // Set up
+        DependencyContainer container = new();
+        DependencySpecification spec1 = new()
+        {
+            Contract = typeof(Mock.IContractA),
+            Implementation = typeof(Mock.ImplementationA),
+            ImplementationFactory = _ => new()
+        };
+        DependencySpecification spec2 = new()
+        {
+            Contract = typeof(Mock.IContractA),
+            Implementation = typeof(Mock.ImplementationA),
+            ImplementationFactory = _ => new()
+        };
+
+        // Act
+        container.Register(spec1)
+            .Register(spec2)
+            .Deregister(spec1);
+        var contains = container.Contains(spec2.Contract);
+
+        // Assert
+        Assert.That(contains, Is.True);
+    }
+
+    [Test]
+    public void Contains_DeregisteredUnregisteredSpecification_True()
+    {
+        // Set up
+        DependencyContainer container = new();
+        DependencySpecification spec1 = new()
+        {
+            Contract = typeof(Mock.IContractA),
+            Implementation = typeof(Mock.ImplementationA),
+            ImplementationFactory = _ => new()
+        };
+        DependencySpecification spec2 = new()
+        {
+            Contract = typeof(Mock.IContractA),
+            Implementation = typeof(Mock.ImplementationA),
+            ImplementationFactory = _ => new()
+        };
+
+        // Act
+        container.Register(spec1)
+            .Deregister(spec2);
+        var contains = container.Contains(spec1.Contract);
+
+        // Assert
+        Assert.That(contains, Is.True);
     }
 
 
