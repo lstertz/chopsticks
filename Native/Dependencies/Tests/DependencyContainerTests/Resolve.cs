@@ -3,8 +3,6 @@ using Chopsticks.Dependencies.Containers;
 
 namespace DependencyContainerTests;
 
-// TODO :: Write tests for Disposal.
-
 public class Resolve
 {
     private static class Mock
@@ -18,14 +16,13 @@ public class Resolve
 
 
     private static DependencyContainer SetUpChildContainer(DependencyLifetime lifetime,
+        out DependencyContainer parentContainer,
         out Func<Mock.IContractA?> getLastImplementation)
     {
-        // TODO :: Update as a parent container of a child container to be returned.
-
         Mock.IContractA? lastImplementation = null;
 
-        var container = new DependencyContainer();
-        container.Register(new()
+        parentContainer = new DependencyContainer();
+        parentContainer.Register(new()
         {
             Contract = typeof(Mock.IContractA),
             Implementation = typeof(Mock.ImplementationA),
@@ -37,6 +34,12 @@ public class Resolve
             },
             Lifetime = lifetime
         });
+
+        var container = new DependencyContainer()
+        {
+            InheritParentDependencies = true,
+            Parent = parentContainer
+        };
 
         getLastImplementation = () => lastImplementation;
         return container;
@@ -258,41 +261,91 @@ public class Resolve
     }
 
 
-    // TODO :: Implement inherited resolution tests.
     [Test]
     public void Resolve_InheritedContained_OutsOwnInstance()
     {
-        Assert.Ignore();
+        // Set up
+        var container = SetUpChildContainer(DependencyLifetime.Contained,
+            out var parentContainer, out var getLastImplementation);
+
+        // Act
+        parentContainer.Resolve(typeof(Mock.IContractA), out var resolvedChildImplementation);
+        container.Resolve(typeof(Mock.IContractA), out var resolvedParentImplementation);
+
+        // Assert
+        Assert.That(getLastImplementation(), Is.EqualTo(resolvedChildImplementation));
+        Assert.That(resolvedChildImplementation, Is.Not.EqualTo(resolvedParentImplementation));
     }
 
     [Test]
     public void Resolve_InheritedContained_True()
     {
-        Assert.Ignore();
+        // Set up
+        var container = SetUpChildContainer(DependencyLifetime.Contained, out _, out _);
+
+        // Act
+        var resolved = container.Resolve(typeof(Mock.IContractA), out _);
+
+        // Assert
+        Assert.That(resolved, Is.True);
     }
 
     [Test]
     public void Resolve_InheritedSingleton_OutsParentInstance()
     {
-        Assert.Ignore();
+        // Set up
+        var container = SetUpChildContainer(DependencyLifetime.Singleton, 
+            out var parentContainer, out var getLastImplementation);
+
+        // Act
+        parentContainer.Resolve(typeof(Mock.IContractA), out var resolvedChildImplementation);
+        container.Resolve(typeof(Mock.IContractA), out var resolvedParentImplementation);
+
+        // Assert
+        Assert.That(getLastImplementation(), Is.EqualTo(resolvedChildImplementation));
+        Assert.That(resolvedChildImplementation, Is.EqualTo(resolvedParentImplementation));
     }
 
     [Test]
     public void Resolve_InheritedSingleton_True()
     {
-        Assert.Ignore();
+        // Set up
+        var container = SetUpChildContainer(DependencyLifetime.Singleton, out _, out _);
+
+        // Act
+        var resolved = container.Resolve(typeof(Mock.IContractA), out _);
+
+        // Assert
+        Assert.That(resolved, Is.True);
     }
 
     [Test]
     public void Resolve_InheritedTransient_OutsNewInstance()
     {
-        Assert.Ignore();
+        // Set up
+        var container = SetUpChildContainer(DependencyLifetime.Singleton,
+            out var parentContainer, out var getLastImplementation);
+
+        // Act
+        parentContainer.Resolve(typeof(Mock.IContractA), out var resolvedChildImplementation);
+        container.Resolve(typeof(Mock.IContractA), out var resolvedParentImplementation);
+
+        // Assert
+        Assert.That(getLastImplementation(), Is.EqualTo(resolvedChildImplementation));
+        Assert.That(resolvedChildImplementation, Is.Not.EqualTo(resolvedParentImplementation));
     }
 
     [Test]
     public void Resolve_InheritedTransient_True()
     {
-        Assert.Ignore();
+        // Set up
+        var container = SetUpChildContainer(DependencyLifetime.Transient, out _, out _);
+
+        // Act
+        var resolved = container.Resolve(typeof(Mock.IContractA), out _);
+
+        // Assert
+        Assert.That(resolved, Is.True);
     }
 
 
