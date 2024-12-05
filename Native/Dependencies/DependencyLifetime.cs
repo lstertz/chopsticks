@@ -18,6 +18,11 @@
         /// <summary>
         /// A new dependency will be instantiated for each resolution.
         /// </summary>
+        /// <remarks>
+        /// Transient dependencies are traditionally very temporal with no expectations of 
+        /// persistent data or disposability. Any such exceptional expectations should be 
+        /// defined on the dependency's contract and handled by the dependent.
+        /// </remarks>
         Transient
     }
 }

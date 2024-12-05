@@ -1,4 +1,5 @@
 ﻿using Chopsticks.Dependencies.Exceptions;
+using Chopsticks.Dependencies.Resolutions;
 using System;
 using System.Collections.Generic;
 
