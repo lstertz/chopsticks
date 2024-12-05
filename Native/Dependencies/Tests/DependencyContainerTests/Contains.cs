@@ -27,12 +27,40 @@ public class Contains
         };
 
         // Act
-        container.Register(spec)
-            .Deregister(spec);
+        container.Register(spec, out var registration)
+            .Deregister(registration);
         var contains = container.Contains(spec.Contract);
 
         // Assert
         Assert.That(contains, Is.False);
+    }
+
+    [Test]
+    public void Contains_DeregisteredFirstAfterMultipleRegistrations_True()
+    {
+        // Set up
+        DependencyContainer container = new();
+        DependencySpecification spec1 = new()
+        {
+            Contract = typeof(Mock.IContractA),
+            Implementation = typeof(Mock.ImplementationA),
+            ImplementationFactory = _ => new()
+        };
+        DependencySpecification spec2 = new()
+        {
+            Contract = typeof(Mock.IContractA),
+            Implementation = typeof(Mock.ImplementationA),
+            ImplementationFactory = _ => new()
+        };
+
+        // Act
+        container.Register(spec1, out var registration1)
+            .Register(spec2, out _)
+            .Deregister(registration1);
+        var contains = container.Contains(spec2.Contract);
+
+        // Assert
+        Assert.That(contains, Is.True);
     }
 
     [Test]
@@ -48,8 +76,8 @@ public class Contains
         };
 
         // Act
-        container.Register(spec)
-            .Deregister(spec);
+        container.Register(spec, out var registration)
+            .Deregister(registration);
         var contains = container.Contains(spec.Implementation);
 
         // Assert
@@ -75,10 +103,10 @@ public class Contains
         };
 
         // Act
-        container.Register(spec1)
-            .Register(spec2)
-            .Deregister(spec1)
-            .Deregister(spec2);
+        container.Register(spec1, out var registration1)
+            .Register(spec2, out var registration2)
+            .Deregister(registration1)
+            .Deregister(registration2);
         var contains = container.Contains(spec2.Contract);
 
         // Assert
@@ -86,7 +114,7 @@ public class Contains
     }
 
     [Test]
-    public void Contains_DeregisteredSingleAfterMultipleRegistrations_True()
+    public void Contains_DeregisteredSecondAfterMultipleRegistrations_True()
     {
         // Set up
         DependencyContainer container = new();
@@ -104,36 +132,9 @@ public class Contains
         };
 
         // Act
-        container.Register(spec1)
-            .Register(spec2)
-            .Deregister(spec1);
-        var contains = container.Contains(spec2.Contract);
-
-        // Assert
-        Assert.That(contains, Is.True);
-    }
-
-    [Test]
-    public void Contains_DeregisteredUnregisteredSpecification_True()
-    {
-        // Set up
-        DependencyContainer container = new();
-        DependencySpecification spec1 = new()
-        {
-            Contract = typeof(Mock.IContractA),
-            Implementation = typeof(Mock.ImplementationA),
-            ImplementationFactory = _ => new()
-        };
-        DependencySpecification spec2 = new()
-        {
-            Contract = typeof(Mock.IContractA),
-            Implementation = typeof(Mock.ImplementationA),
-            ImplementationFactory = _ => new()
-        };
-
-        // Act
-        container.Register(spec1)
-            .Deregister(spec2);
+        container.Register(spec1, out _)
+            .Register(spec2, out var registration2)
+            .Deregister(registration2);
         var contains = container.Contains(spec1.Contract);
 
         // Assert
@@ -160,7 +161,7 @@ public class Contains
         };
 
         // Act
-        parentContainer.Register(spec);
+        parentContainer.Register(spec, out _);
         var contains = childContainer.Contains(spec.Contract);
 
         // Assert
@@ -186,7 +187,7 @@ public class Contains
         };
 
         // Act
-        parentContainer.Register(spec);
+        parentContainer.Register(spec, out _);
         var contains = childContainer.Contains(typeof(Mock.IContractB));
 
         // Assert
@@ -212,7 +213,7 @@ public class Contains
         };
 
         // Act
-        parentContainer.Register(spec);
+        parentContainer.Register(spec, out _);
         var contains = childContainer.Contains(spec.Contract);
 
         // Assert
@@ -233,7 +234,7 @@ public class Contains
         };
 
         // Act
-        container.Register(spec);
+        container.Register(spec, out _);
         var contains = container.Contains(spec.Implementation);
 
         // Assert
@@ -253,7 +254,7 @@ public class Contains
         };
 
         // Act
-        container.Register(spec);
+        container.Register(spec, out _);
         var contains = container.Contains(typeof(Mock.IContractB));
 
         // Assert
@@ -273,7 +274,7 @@ public class Contains
         };
 
         // Act
-        container.Register(spec);
+        container.Register(spec, out _);
         var contains = container.Contains(spec.Contract);
 
         // Assert
@@ -293,7 +294,7 @@ public class Contains
         };
 
         // Act
-        container.Register(spec);
+        container.Register(spec, out _);
         var contains = container.Contains(typeof(Mock.IContractA));
 
         // Assert
@@ -313,7 +314,7 @@ public class Contains
         };
 
         // Act
-        container.Register(spec);
+        container.Register(spec, out _);
         var contains = container.Contains(spec.Implementation);
 
         // Assert

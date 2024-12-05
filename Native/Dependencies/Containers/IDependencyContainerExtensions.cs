@@ -12,15 +12,39 @@ namespace Chopsticks.Dependencies.Containers
         }
 
 
+        public static IDependencyContainer Register(
+            this IDependencyContainer container,
+            DependencySpecification specification)
+        {
+            throw new NotImplementedException();
+        }
+
         public static IDependencyContainer Register<TImplementation>(
             this IDependencyContainer container,
             TImplementation dependency)
         {
             throw new NotImplementedException();
         }
+
+        public static IDependencyContainer Register<TImplementation>(
+            this IDependencyContainer container,
+            TImplementation dependency, out DependencyRegistration registration)
+        {
+            throw new NotImplementedException();
+        }
+
         public static IDependencyContainer Register<TImplementation>(
             this IDependencyContainer container,
             Func<IDependencyContainer, TImplementation> dependencyFactory,
+            DependencyLifetime lifetime = DependencyLifetime.Singleton)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static IDependencyContainer Register<TImplementation>(
+            this IDependencyContainer container,
+            Func<IDependencyContainer, TImplementation> dependencyFactory,
+            out DependencyRegistration registration,
             DependencyLifetime lifetime = DependencyLifetime.Singleton)
         {
             throw new NotImplementedException();
@@ -33,9 +57,29 @@ namespace Chopsticks.Dependencies.Containers
         {
             throw new NotImplementedException();
         }
+
+        public static IDependencyContainer Register<TImplementation, TContract>(
+            this IDependencyContainer container,
+            TContract singletonDependency, 
+            out DependencyRegistration registration)
+            where TImplementation : TContract
+        {
+            throw new NotImplementedException();
+        }
+
         public static IDependencyContainer Register<TImplementation, TContract>(
             this IDependencyContainer container,
             Func<IDependencyContainer, TImplementation> dependencyFactory,
+            DependencyLifetime lifetime = DependencyLifetime.Singleton)
+             where TImplementation : TContract
+        {
+            throw new NotImplementedException();
+        }
+
+        public static IDependencyContainer Register<TImplementation, TContract>(
+            this IDependencyContainer container,
+            Func<IDependencyContainer, TImplementation> dependencyFactory,
+            out DependencyRegistration registration,
             DependencyLifetime lifetime = DependencyLifetime.Singleton)
              where TImplementation : TContract
         {

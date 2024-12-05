@@ -37,20 +37,23 @@ namespace Chopsticks.Dependencies.Containers
 
 
         /// <summary>
-        /// Deregisters the dependency defined by the given specification.
+        /// Deregisters the dependency identified by the given registration.
         /// </summary>
-        /// <param name="specification">The specification that defines the 
+        /// <param name="registration">The registration that identifies the 
         /// dependency to be deregistered.</param>
         /// <returns>This container, to chain additional manipulations.</returns>
-        IDependencyContainer Deregister(DependencySpecification specification);
+        IDependencyContainer Deregister(DependencyRegistration registration);
 
         /// <summary>
         /// Registers the dependency defined by the given specification.
         /// </summary>
         /// <param name="specification">The specification that defines the 
         /// dependency to be registered.</param>
+        /// <param name="registration">The registration that can identify the dependency for 
+        /// deregistration by <see cref="Deregister(DependencyRegistration)"/></param>
         /// <returns>This container, to chain additional manipulations.</returns>
-        IDependencyContainer Register(DependencySpecification specification);
+        IDependencyContainer Register(DependencySpecification specification, 
+            out DependencyRegistration registration);
 
 
         /// <summary>

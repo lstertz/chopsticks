@@ -10,42 +10,79 @@ namespace Chopsticks.Dependencies.Containers
         /// Resolves, and maintains resolved implementation instances of, the dependency 
         /// specified by the provided dependency specification.
         /// </summary>
-        /// <param name="specification">The spec that defines the dependency that is 
-        /// resolved and maintained by this resolution.</param>
-        private abstract class Resolution(DependencySpecification specification) : IDisposable
+        /// <param name="contract">The contract that this resolution fulfills.</param>
+        /// <param name="factory">The factory that provides implementations for resolution.</param>
+        private abstract class Resolution(Type contract, 
+            Func<IDependencyContainer, object> factory) : 
+            IDisposable
         {
-            protected DependencySpecification Specification { get; init; } = specification;
+            public Func<IDependencyContainer, object> Factory { get; private init; } = factory;
+
+            // TODO :: Use the registration in place of the specification (reduce memory footprint).
+
+            public DependencyRegistration Registration { get; private init; } = new()
+            {
+                Contract = contract,
+            };
+
 
             public abstract void Dispose();
+
+            public abstract object Get(IDependencyContainer container);
         }
 
-        private class ContainedResolution(DependencySpecification specification) :
-            Resolution(specification)
+        private class ContainedResolution(Type contract, 
+            Func<IDependencyContainer, object> factory) :
+            Resolution(contract, factory)
+        {
+            private object? _instance;
+
+
+            public override void Dispose()
+            {
+                if (_instance is IDisposable disposable)
+                    disposable.Dispose();
+
+                _instance = null;
+            }
+
+            public override object Get(IDependencyContainer container) =>
+                _instance ??= Factory(container);
+        }
+
+        private class SingletonResolution(Type contract, 
+            Func<IDependencyContainer, object> factory) :
+            Resolution(contract, factory)
+        {
+            private object? _instance;
+
+            public override void Dispose()
+            {
+                if (_instance is IDisposable disposable)
+                    disposable.Dispose();
+
+                _instance = null;
+
+            }
+
+            public override object Get(IDependencyContainer container) => 
+                _instance ??= Factory(container);
+        }
+
+        private class TransientResolution(Type contract, 
+            Func<IDependencyContainer, object> factory) :
+            Resolution(contract, factory)
         {
             public override void Dispose()
             {
             }
-        }
 
-        private class SingletonResolution(DependencySpecification specification) : 
-            Resolution(specification)
-        {
-            public override void Dispose()
-            {
-            }
-        }
-
-        private class TransientResolution(DependencySpecification specification) :
-            Resolution(specification)
-        {
-            public override void Dispose()
-            {
-            }
+            public override object Get(IDependencyContainer container) => Factory(container);
         }
 
 
         /// <inheritdoc/>
-        public bool InheritParentDependencies { get; set; }
+        public bool InheritParentDependencies { get; set; } = true;
 
         /// <inheritdoc/>
         public IDependencyContainer? Parent { get; set; }
@@ -75,35 +112,54 @@ namespace Chopsticks.Dependencies.Containers
 
 
         /// <inheritdoc/>
-        public IDependencyContainer Deregister(DependencySpecification specification)
+        public IDependencyContainer Deregister(DependencyRegistration registration)
         {
-            if (!_resolutions.ContainsKey(specification.Contract))
+            if (!_resolutions.ContainsKey(registration.Contract))
                 return this;
 
-            // TODO :: Deregistration needs to be more accommodating, for example, to deregister 
-            //          a specific singleton.
+            // TODO :: May need to handle Contained (inherited resolutions) differently.
 
-            var resolution = _resolutions[specification.Contract][0];
+            int index = 0;
+            Resolution? resolution = null;
+            var resolutions = _resolutions[registration.Contract];
+            int count = resolutions.Count;
+            for (; index < count; index++)
+            {
+                if (resolutions[index].Registration.Equals(registration))
+                {
+                    resolution = resolutions[index];
+                    break;
+                }
+            }
+
+            if (resolution == null)
+                return this;
+
             resolution.Dispose();
 
-            _resolutions[specification.Contract].RemoveAt(0);
-            if (_resolutions[specification.Contract].Count == 0)
-                _resolutions.Remove(specification.Contract);
+            resolutions.RemoveAt(index);
+            if (resolutions.Count == 0)
+                _resolutions.Remove(registration.Contract);
 
             return this;
         }
 
         /// <inheritdoc/>
-        public IDependencyContainer Register(DependencySpecification specification)
+        public IDependencyContainer Register(DependencySpecification specification, 
+            out DependencyRegistration registration)
         {
             Resolution resolution = specification.Lifetime switch
             {
-                DependencyLifetime.Contained => new ContainedResolution(specification),
-                DependencyLifetime.Singleton => new SingletonResolution(specification),
-                DependencyLifetime.Transient => new TransientResolution(specification),
+                DependencyLifetime.Contained => new ContainedResolution(
+                    specification.Contract, specification.ImplementationFactory),
+                DependencyLifetime.Singleton => new SingletonResolution(
+                    specification.Contract, specification.ImplementationFactory),
+                DependencyLifetime.Transient => new TransientResolution(
+                    specification.Contract, specification.ImplementationFactory),
                 _ => throw new NotImplementedException($"The lifetime of " +
                     $"{specification.Lifetime} is not supported.")
             };
+            registration = resolution.Registration;
 
             if (_resolutions.TryAdd(specification.Contract, [resolution]))
                 return this;
@@ -123,7 +179,14 @@ namespace Chopsticks.Dependencies.Containers
         /// <inheritdoc/>
         public bool Resolve(Type dependencyType, out object? implementation)
         {
-            throw new NotImplementedException();
+            implementation = null;
+
+            var resolution = GetResolution(dependencyType);
+            if (resolution == null)
+                return false;
+
+
+            return true;
         }
 
         /// <inheritdoc/>
