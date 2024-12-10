@@ -17,7 +17,7 @@ namespace Chopsticks.Dependencies.Resolutions
         /// The factory that provides implementations for resolution.
         /// </summary>
         protected Func<IDependencyContainer, object> Factory { get; private init; } = factory;
-        
+
         /// <summary>
         /// The registration that identifies this resolution as a dependency of a 
         /// <see cref="IDependencyContainer"/>.

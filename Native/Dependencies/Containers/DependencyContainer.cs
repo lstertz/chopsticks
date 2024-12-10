@@ -18,9 +18,20 @@ namespace Chopsticks.Dependencies.Containers
         /// A mapping of contract types to all resolutions for each contract.
         /// </summary>
         private readonly Dictionary<Type, List<DependencyResolution>> _resolutions = [];
+        private readonly IDependencyResolutionFactory _resolutionFactory;
 
 
-        // TODO :: Leverage a resolution factory.
+        /// <summary>
+        /// Constructs a new dependnecy container with the default resolution factory.
+        /// </summary>
+        public DependencyContainer() =>
+            _resolutionFactory = new DependencyResolutionFactory();
+
+        /// <summary>
+        /// Constructs a new dependency container with the given resolution factory.
+        /// </summary>
+        public DependencyContainer(IDependencyResolutionFactory resolutionFactory) => 
+            _resolutionFactory = resolutionFactory;
 
 
         /// <inheritdoc/>
@@ -77,18 +88,7 @@ namespace Chopsticks.Dependencies.Containers
         public IDependencyContainer Register(DependencySpecification specification, 
             out DependencyRegistration registration)
         {
-            // TODO :: Replace with injected factory.
-            DependencyResolution resolution = specification.Lifetime switch
-            {
-                DependencyLifetime.Contained => new ContainedResolution(
-                    specification.Contract, specification.ImplementationFactory),
-                DependencyLifetime.Singleton => new SingletonResolution(
-                    specification.Contract, specification.ImplementationFactory),
-                DependencyLifetime.Transient => new TransientResolution(
-                    specification.Contract, specification.ImplementationFactory),
-                _ => throw new NotImplementedException($"The lifetime of " +
-                    $"{specification.Lifetime} is not supported.")
-            };
+            var resolution = _resolutionFactory.BuildResolutionFor(specification);
             registration = resolution.Registration;
 
             if (_resolutions.TryAdd(specification.Contract, [resolution]))
@@ -111,7 +111,7 @@ namespace Chopsticks.Dependencies.Containers
         {
             implementation = null;
 
-            var resolution = this.GetResolution(dependencyType);
+            var resolution = GetResolution(dependencyType);
             if (resolution == null)
                 return Parent?.Resolve(dependencyType, out implementation) is true;
 

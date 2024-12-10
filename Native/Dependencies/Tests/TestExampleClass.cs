@@ -3,6 +3,7 @@ using Chopsticks.Dependencies;
 namespace DependencyContainerTests;
 
 // TODO :: Write tests for Disposal.
+// TODO :: Write tests for resolution factory.
 
 public class Deregistration
 {
