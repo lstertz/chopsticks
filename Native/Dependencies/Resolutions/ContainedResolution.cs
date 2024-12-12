@@ -12,6 +12,10 @@ namespace Chopsticks.Dependencies.Resolutions
         Func<IDependencyContainer, object> factory) :
         DependencyResolution(contract, factory)
     {
+        /// <inheritdoc/>
+        public override bool IsContained => true;
+
+
         private object? _instance;
 
 

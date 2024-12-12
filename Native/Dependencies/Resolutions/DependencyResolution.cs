@@ -14,18 +14,25 @@ namespace Chopsticks.Dependencies.Resolutions
         IDisposable
     {
         /// <summary>
-        /// The factory that provides implementations for resolution.
+        /// Specifies whether this resolution should be contained within its container, 
+        /// which should require it to be copied to any inheriting containers.
         /// </summary>
-        protected Func<IDependencyContainer, object> Factory { get; private init; } = factory;
+        public virtual bool IsContained => false;
 
         /// <summary>
         /// The registration that identifies this resolution as a dependency of a 
         /// <see cref="IDependencyContainer"/>.
         /// </summary>
-        public DependencyRegistration Registration { get; private init; } = new()
+        public DependencyRegistration Registration { get; protected init; } = new()
         {
             Contract = contract,
         };
+
+
+        /// <summary>
+        /// The factory that provides implementations for resolution.
+        /// </summary>
+        protected Func<IDependencyContainer, object> Factory { get; init; } = factory;
 
 
         /// <inheritdoc/>
