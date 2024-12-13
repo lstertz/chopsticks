@@ -16,8 +16,8 @@ namespace Chopsticks.Dependencies.Resolutions
         public override bool IsContained => true;
 
 
+        // TODO :: Update resolutions to self-manage across container instances.
         private object? _instance;
-
 
         /// <inheritdoc/>
         public override void Dispose()

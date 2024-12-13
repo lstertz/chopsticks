@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace Chopsticks.Dependencies.Containers
 {
     /// <summary>
-    /// Manages the registration and containment of dependencies, 
+    /// Manages the containment of dependencies, 
     /// providing localized resolution while accounting for dependency scope
     /// and accessibility.
     /// </summary>
@@ -19,22 +19,12 @@ namespace Chopsticks.Dependencies.Containers
         bool InheritParentDependencies { get; set; }
 
         /// <summary>
-        /// The parent container of this container.
+        /// The parent container, as a resolution provider.
         /// </summary>
         /// <remarks>
         /// This is null if this container has no parent container.
         /// </remarks>
-        IDependencyContainer? Parent { get; set; }
-
-
-        /// <summary>
-        /// Specifies whether this container contains a resolution for the identified dependency.
-        /// </summary>
-        /// <param name="dependencyType">The type of the dependency, either as the 
-        /// implementation or contract type that would be resolved, to be checked for.</param>
-        /// <returns>Whether this container contains a resolution 
-        /// for the identified dependency.</returns>
-        bool Contains(Type dependencyType);
+        IDependencyResolutionProvider? Parent { get; set; }
 
 
         /// <summary>
@@ -61,34 +51,34 @@ namespace Chopsticks.Dependencies.Containers
         /// Resolves the dependency of the specified type with the 
         /// first registered implementation.
         /// </summary>
-        /// <param name="dependencyType">The type of the dependency, either as the 
-        /// implementation type or the contract type that would be resolved.</param>
+        /// <param name="contract">The type of the contract that the implementation resolve, 
+        /// as a dependency.</param>
         /// <param name="customErrorMessage">The custom message of the exception 
         /// thrown if the dependency could not be resolved.</param>
         /// <exception cref="MissingDependencyException">Thrown if the specified 
         /// dependency could not be resolved.</exception>
-        /// <returns>The resolved dependency.</returns>
-        object AssertiveResolve(Type dependencyType, string? customErrorMessage = null);
+        /// <returns>The resolving dependency implementation.</returns>
+        object AssertiveResolve(Type contract, string? customErrorMessage = null);
 
         /// <summary>
         /// Resolves the dependency of the specified type with the 
         /// first registered implementation.
         /// </summary>
-        /// <param name="dependencyType">The type of the dependency, either as the 
-        /// implementation type or the contract type that would be resolved.</param>
+        /// <param name="contract">The type of the contract that the implementation resolve, 
+        /// as a dependency.</param>
         /// <param name="implementation">The resolving dependency implementation, or null 
         /// if it could not be resolved.</param>
         /// <returns>Whether the dependency was successfully resolved.</returns>
-        bool Resolve(Type dependencyType, out object? implementation);
+        bool Resolve(Type contract, out object? implementation);
 
 
         /// <summary>
         /// Resolves the dependency of the specified type with all registered implementations.
         /// </summary>
-        /// <param name="dependencyType">The type of the dependency, either as the 
-        /// implementation type or the contract type that would be resolved.</param>
+        /// <param name="contract">The type of the contract that the implementation resolve, 
+        /// as a dependency.</param>
         /// <returns>The collection of all resolving implementations..</returns>
-        IEnumerable<object> ResolveAll(Type dependencyType);
+        IEnumerable<object> ResolveAll(Type contract);
 
         /// <summary>
         /// Resolves all dependencies that will be singletons within the scope of this container, 

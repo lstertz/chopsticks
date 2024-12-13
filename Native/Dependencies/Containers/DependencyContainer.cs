@@ -5,13 +5,13 @@ using System.Collections.Generic;
 namespace Chopsticks.Dependencies.Containers
 {
     /// <inheritdoc cref="IDependencyContainer"/>
-    public class DependencyContainer : IDependencyContainer, IDisposable
+    public class DependencyContainer : IDependencyContainer, IDependencyResolutionProvider, IDisposable
     {
         /// <inheritdoc/>
         public bool InheritParentDependencies { get; set; } = true;
 
         /// <inheritdoc/>
-        public IDependencyContainer? Parent { get; set; }
+        public IDependencyResolutionProvider? Parent { get; set; }
 
 
         /// <summary>
@@ -37,17 +37,8 @@ namespace Chopsticks.Dependencies.Containers
         /// <inheritdoc/>
         public void Dispose()
         {
+            // TODO :: Clean-up the Contained resolutions in parents.
             throw new NotImplementedException();
-        }
-
-
-        /// <inheritdoc/>
-        public bool Contains(Type dependencyType)
-        {
-            if (InheritParentDependencies && Parent?.Contains(dependencyType) == true)
-                return true;
-
-            return _resolutions.ContainsKey(dependencyType);
         }
 
 
@@ -57,15 +48,13 @@ namespace Chopsticks.Dependencies.Containers
             if (!_resolutions.ContainsKey(registration.Contract))
                 return this;
 
-            // TODO :: May need to handle Contained (inherited resolutions) differently.
-
             int index = 0;
             DependencyResolution? resolution = null;
             var resolutions = _resolutions[registration.Contract];
             int count = resolutions.Count;
             for (; index < count; index++)
             {
-                if (resolutions[index].Registration.Equals(registration))
+                if (ReferenceEquals(resolutions[index].Registration, registration))
                 {
                     resolution = resolutions[index];
                     break;
@@ -100,27 +89,27 @@ namespace Chopsticks.Dependencies.Containers
 
 
         /// <inheritdoc/>
-        public object AssertiveResolve(Type dependencyType,
+        public object AssertiveResolve(Type contract,
             string? customErrorMessage = null)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc/>
-        public bool Resolve(Type dependencyType, out object? implementation)
+        public bool Resolve(Type contract, out object? implementation)
         {
             implementation = null;
 
-            var resolution = GetResolution(dependencyType);
+            var resolution = (this as IDependencyResolutionProvider).GetResolution(contract);
             if (resolution == null)
-                return Parent?.Resolve(dependencyType, out implementation) is true;
+                return false;
 
             implementation = resolution.Get(this);
             return true;
         }
 
         /// <inheritdoc/>
-        public IEnumerable<object> ResolveAll(Type dependencyType)
+        public IEnumerable<object> ResolveAll(Type contract)
         {
             throw new NotImplementedException();
         }
@@ -132,33 +121,29 @@ namespace Chopsticks.Dependencies.Containers
         }
 
 
-        /// <summary>
-        /// Provides the first resolution for the specified dependency type.
-        /// </summary>
-        /// <param name="dependencyType">The type of the dependency, either as the 
-        /// implementation type or the contract type.</param>
-        /// <returns>The first resolution for the specified dependency type, 
-        /// or null if there is no such known resolution.</returns>
-        private DependencyResolution? GetResolution(Type dependencyType)
+        /// <inheritdoc/>
+        bool IDependencyResolutionProvider.CanProvide(Type contract)
         {
-            if (!_resolutions.TryGetValue(dependencyType, out var resolution))
-                return null;
+            if (InheritParentDependencies && (Parent?.CanProvide(contract) == true))
+                return true;
 
-            // TODO :: Find the local resolution first, then check parent's resolutions.
-            // TODO :: If the resolution is Contained, cache it as a local resolution during resolving.
-            return null;
+            return _resolutions.ContainsKey(contract);
         }
 
-        /// <summary>
-        /// Provides all resolutions for the specified dependency type.
-        /// </summary>
-        /// <param name="dependencyType">The type of the dependency, either as the 
-        /// implementation type or the contract type.</param>
-        /// <returns>All resolutions for the specified dependency type.</returns>
-        private IEnumerable<DependencyResolution> GetResolutions(Type dependencyType)
+        /// <inheritdoc/>
+        DependencyResolution? IDependencyResolutionProvider.GetResolution(Type contract)
         {
-            // TODO :: Find the local resolution first, then join with unique parent's resolutions.
-            // TODO :: If any resolution is Contained, cache it as a local resolution during resolving.
+            if (!_resolutions.TryGetValue(contract, out var resolutions))
+                return Parent?.GetResolution(contract);
+
+            return resolutions[0];
+        }
+
+        /// <inheritdoc/>
+        IEnumerable<DependencyResolution> IDependencyResolutionProvider.GetResolutions(
+            Type contract)
+        {
+            // TODO :: Implement.
             return [];
         }
     }

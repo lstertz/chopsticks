@@ -1,8 +1,9 @@
 ﻿using Chopsticks.Dependencies.Containers;
+using Chopsticks.Dependencies.Resolutions;
 
 namespace DependencyContainerTests;
 
-public class Contains
+public class CanProvide
 {
     private static class Mock
     {
@@ -29,7 +30,7 @@ public class Contains
         // Act
         container.Register(spec, out var registration)
             .Deregister(registration);
-        var contains = container.Contains(spec.Contract);
+        var contains = (container as IDependencyResolutionProvider).CanProvide(spec.Contract);
 
         // Assert
         Assert.That(contains, Is.False);
@@ -57,7 +58,7 @@ public class Contains
         container.Register(spec1, out var registration1)
             .Register(spec2, out _)
             .Deregister(registration1);
-        var contains = container.Contains(spec2.Contract);
+        var contains = (container as IDependencyResolutionProvider).CanProvide(spec2.Contract);
 
         // Assert
         Assert.That(contains, Is.True);
@@ -78,7 +79,8 @@ public class Contains
         // Act
         container.Register(spec, out var registration)
             .Deregister(registration);
-        var contains = container.Contains(spec.Implementation);
+        var contains = (container as IDependencyResolutionProvider).CanProvide(
+            spec.Implementation);
 
         // Assert
         Assert.That(contains, Is.False);
@@ -107,7 +109,7 @@ public class Contains
             .Register(spec2, out var registration2)
             .Deregister(registration1)
             .Deregister(registration2);
-        var contains = container.Contains(spec2.Contract);
+        var contains = (container as IDependencyResolutionProvider).CanProvide(spec2.Contract);
 
         // Assert
         Assert.That(contains, Is.False);
@@ -135,7 +137,7 @@ public class Contains
         container.Register(spec1, out _)
             .Register(spec2, out var registration2)
             .Deregister(registration2);
-        var contains = container.Contains(spec1.Contract);
+        var contains = (container as IDependencyResolutionProvider).CanProvide(spec1.Contract);
 
         // Assert
         Assert.That(contains, Is.True);
@@ -162,7 +164,7 @@ public class Contains
 
         // Act
         parentContainer.Register(spec, out _);
-        var contains = childContainer.Contains(spec.Contract);
+        var contains = (childContainer as IDependencyResolutionProvider).CanProvide(spec.Contract);
 
         // Assert
         Assert.That(contains, Is.True);
@@ -188,7 +190,8 @@ public class Contains
 
         // Act
         parentContainer.Register(spec, out _);
-        var contains = childContainer.Contains(typeof(Mock.IContractB));
+        var contains = (childContainer as IDependencyResolutionProvider).CanProvide(
+            typeof(Mock.IContractB));
 
         // Assert
         Assert.That(contains, Is.False);
@@ -214,7 +217,7 @@ public class Contains
 
         // Act
         parentContainer.Register(spec, out _);
-        var contains = childContainer.Contains(spec.Contract);
+        var contains = (childContainer as IDependencyResolutionProvider).CanProvide(spec.Contract);
 
         // Assert
         Assert.That(contains, Is.False);
@@ -235,7 +238,8 @@ public class Contains
 
         // Act
         container.Register(spec, out _);
-        var contains = container.Contains(spec.Implementation);
+        var contains = (container as IDependencyResolutionProvider).CanProvide(
+            spec.Implementation);
 
         // Assert
         Assert.That(contains, Is.False);
@@ -255,7 +259,8 @@ public class Contains
 
         // Act
         container.Register(spec, out _);
-        var contains = container.Contains(typeof(Mock.IContractB));
+        var contains = (container as IDependencyResolutionProvider).CanProvide(
+            typeof(Mock.IContractB));
 
         // Assert
         Assert.That(contains, Is.False);
@@ -275,7 +280,7 @@ public class Contains
 
         // Act
         container.Register(spec, out _);
-        var contains = container.Contains(spec.Contract);
+        var contains = (container as IDependencyResolutionProvider).CanProvide(spec.Contract);
 
         // Assert
         Assert.That(contains, Is.True);
@@ -295,7 +300,8 @@ public class Contains
 
         // Act
         container.Register(spec, out _);
-        var contains = container.Contains(typeof(Mock.IContractA));
+        var contains = (container as IDependencyResolutionProvider).CanProvide(
+            typeof(Mock.IContractA));
 
         // Assert
         Assert.That(contains, Is.False);
@@ -315,7 +321,8 @@ public class Contains
 
         // Act
         container.Register(spec, out _);
-        var contains = container.Contains(spec.Implementation);
+        var contains = (container as IDependencyResolutionProvider).CanProvide(
+            spec.Implementation);
 
         // Assert
         Assert.That(contains, Is.True);
