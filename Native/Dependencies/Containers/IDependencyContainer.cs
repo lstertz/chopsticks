@@ -53,19 +53,6 @@ namespace Chopsticks.Dependencies.Containers
         /// </summary>
         /// <param name="contract">The type of the contract that the implementation resolve, 
         /// as a dependency.</param>
-        /// <param name="customErrorMessage">The custom message of the exception 
-        /// thrown if the dependency could not be resolved.</param>
-        /// <exception cref="MissingDependencyException">Thrown if the specified 
-        /// dependency could not be resolved.</exception>
-        /// <returns>The resolving dependency implementation.</returns>
-        object AssertiveResolve(Type contract, string? customErrorMessage = null);
-
-        /// <summary>
-        /// Resolves the dependency of the specified type with the 
-        /// first registered implementation.
-        /// </summary>
-        /// <param name="contract">The type of the contract that the implementation resolve, 
-        /// as a dependency.</param>
         /// <param name="implementation">The resolving dependency implementation, or null 
         /// if it could not be resolved.</param>
         /// <returns>Whether the dependency was successfully resolved.</returns>

@@ -41,7 +41,6 @@ namespace Chopsticks.Dependencies.Resolutions
         /// <summary>
         /// Provides an implementation to resolve the dependency.
         /// </summary>
-        /// <remarks>
         /// <param name="container">The container that will provide any constructed 
         /// implementation's own dependencies.</param>
         /// <returns>An implementation that resolves the dependency.</returns>

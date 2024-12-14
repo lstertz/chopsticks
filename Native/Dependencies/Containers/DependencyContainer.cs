@@ -43,6 +43,16 @@ namespace Chopsticks.Dependencies.Containers
 
 
         /// <inheritdoc/>
+        public bool CanProvide(Type contract)
+        {
+            if (InheritParentDependencies && (Parent?.CanProvide(contract) == true))
+                return true;
+
+            return _resolutions.ContainsKey(contract);
+        }
+
+
+        /// <inheritdoc/>
         public IDependencyContainer Deregister(DependencyRegistration registration)
         {
             if (!_resolutions.ContainsKey(registration.Contract))
@@ -89,13 +99,6 @@ namespace Chopsticks.Dependencies.Containers
 
 
         /// <inheritdoc/>
-        public object AssertiveResolve(Type contract,
-            string? customErrorMessage = null)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <inheritdoc/>
         public bool Resolve(Type contract, out object? implementation)
         {
             implementation = null;
@@ -120,15 +123,6 @@ namespace Chopsticks.Dependencies.Containers
             throw new NotImplementedException();
         }
 
-
-        /// <inheritdoc/>
-        bool IDependencyResolutionProvider.CanProvide(Type contract)
-        {
-            if (InheritParentDependencies && (Parent?.CanProvide(contract) == true))
-                return true;
-
-            return _resolutions.ContainsKey(contract);
-        }
 
         /// <inheritdoc/>
         DependencyResolution? IDependencyResolutionProvider.GetResolution(Type contract)

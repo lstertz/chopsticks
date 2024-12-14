@@ -6,10 +6,6 @@ namespace Chopsticks.Dependencies.Containers
 {
     public static class IDependencyContainerExtensions
     {
-        public static bool Contains<TDependency>(this IDependencyContainer container)
-        {
-            throw new NotImplementedException();
-        }
 
 
         public static IDependencyContainer Register(
@@ -101,6 +97,24 @@ namespace Chopsticks.Dependencies.Containers
         /// <returns>The resolved dependency.</returns>
         public static TDependency AssertiveResolve<TDependency>(
             this IDependencyContainer container, string? customErrorMessage = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Resolves the dependency of the specified type with the 
+        /// first registered implementation.
+        /// </summary>
+        /// <param name="container">The container resolving the dependency.</param>
+        /// <param name="contract">The type of the contract that the implementation resolve, 
+        /// as a dependency.</param>
+        /// <param name="customErrorMessage">The custom message of the exception 
+        /// thrown if the dependency could not be resolved.</param>
+        /// <exception cref="MissingDependencyException">Thrown if the specified 
+        /// dependency could not be resolved.</exception>
+        /// <returns>The resolving dependency implementation.</returns>
+        public static object AssertiveResolve(this IDependencyContainer container, Type contract,
+            string? customErrorMessage = null)
         {
             throw new NotImplementedException();
         }
