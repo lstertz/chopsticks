@@ -1,13 +1,13 @@
-﻿using UnityEngine;
+﻿using Chopsticks.Dependencies;
+using UnityEngine;
 
-namespace Chopsticks.Dependencies
+namespace Examples
 {
-
     public class DependentA : MonoDependent
     {
         public IContractB B => _b.Get()!;
         [SerializeField]
-        private Dependency<IContractB> _b;
+        private Dependency<IContractB> _b = new();
 
         //private Dependencies<IContractB> Bs;
 

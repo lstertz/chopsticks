@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using Chopsticks.Dependencies.Resolutions;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace Chopsticks.Dependencies.Containers
 {
@@ -9,15 +12,20 @@ namespace Chopsticks.Dependencies.Containers
     /// </summary>
     public class MonoContainer : MonoBehaviour, IDependencyContainer
     {
-        public bool InheritParentDependencies => _container.InheritParentDependencies;
+        public bool InheritParentDependencies
+        {
+            get => _container.InheritParentDependencies;
+            set => _container.InheritParentDependencies = value;
+        }
         [SerializeField]  // TODO :: Prevent editing during runtime.
         private bool _inheritParentDependencies;
 
-        public IDependencyContainer Parent
+        public IDependencyResolutionProvider Parent
         {
             get => _container.Parent;
             set => _container.Parent = value;
         }
+
         // TODO ?? Permit an override parent, to work detached from the hierarchy.
 
         private DependencyContainer _container;
@@ -48,6 +56,33 @@ namespace Chopsticks.Dependencies.Containers
         private void OnTransformParentChanged()
         {
             _container.Parent = null;  // TODO :: Climb the tree to find the new parent.
+        }
+
+
+        public IDependencyContainer Deregister(DependencyRegistration registration)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IDependencyContainer Register(DependencySpecification specification, 
+            out DependencyRegistration registration)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Resolve(Type dependencyType, out object implementation)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<object> ResolveAll(Type dependencyType)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ResolveAllSingletons()
+        {
+            throw new NotImplementedException();
         }
     }
 }

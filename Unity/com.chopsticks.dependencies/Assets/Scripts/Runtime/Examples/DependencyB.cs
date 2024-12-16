@@ -1,4 +1,6 @@
-﻿namespace Chopsticks.Dependencies
+﻿using Chopsticks.Dependencies;
+
+namespace Examples
 {
     public interface IContractB
     {

@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using Chopsticks.Dependencies;
+using UnityEngine;
 
-namespace Chopsticks.Dependencies
+namespace Examples
 {
     public interface IContractA
     {

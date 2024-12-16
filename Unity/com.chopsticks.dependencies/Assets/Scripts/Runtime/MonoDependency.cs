@@ -28,6 +28,13 @@ namespace Chopsticks.Dependencies
         protected virtual void OnTransformParentChanged()
         {
             // Switch containers, if necessary.
+
+            OnContainerChanged();
+        }
+
+        protected virtual void OnContainerChanged()
+        {
+
         }
     }
 }
