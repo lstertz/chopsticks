@@ -50,7 +50,7 @@ public class Get
         var resolution = SetUp.StandardResolution(out var container, out var factory,
             out var implementation);
 
-        resolution.Get(container);
+        var firstImplementation = resolution.Get(container);
         factory.ClearReceivedCalls();
 
         // Act
@@ -58,6 +58,7 @@ public class Get
 
         // Assert
         factory.DidNotReceiveWithAnyArgs().Invoke(container);
+        Assert.That(resultingImplementation, Is.EqualTo(firstImplementation));
         Assert.That(resultingImplementation, Is.EqualTo(implementation));
     }
 }

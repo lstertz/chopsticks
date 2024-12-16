@@ -1,5 +1,6 @@
 ﻿using Chopsticks.Dependencies.Containers;
 using System;
+using System.Collections.Generic;
 
 namespace Chopsticks.Dependencies.Resolutions
 {
@@ -15,21 +16,40 @@ namespace Chopsticks.Dependencies.Resolutions
         /// <inheritdoc/>
         public override bool IsContained => true;
 
+        private readonly Dictionary<IDependencyContainer, object> _instances = new(1);
 
-        // TODO :: Update resolutions to self-manage across container instances.
-        private object? _instance;
 
         /// <inheritdoc/>
         public override void Dispose()
         {
-            if (_instance is IDisposable disposable)
-                disposable.Dispose();
+            foreach (var instance in _instances.Values)
+                if (instance is IDisposable disposable)
+                    disposable.Dispose();
 
-            _instance = null;
+            _instances.Clear();
         }
 
         /// <inheritdoc/>
-        public override object Get(IDependencyContainer container) =>
-            _instance ??= Factory(container);
+        public override void DisposeFor(IDependencyContainer container)
+        {
+            if (_instances.TryGetValue(container, out var instance))
+                if (instance is IDisposable disposable)
+                    disposable.Dispose();
+
+            _instances.Remove(container);
+        }
+
+
+        /// <inheritdoc/>
+        public override object Get(IDependencyContainer container)
+        {
+            if (!_instances.TryGetValue(container, out var instance))
+            {
+                instance = Factory(container);
+                _instances.Add(container, instance);
+            }
+
+            return instance;
+        }
     }
 }

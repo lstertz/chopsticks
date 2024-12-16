@@ -35,8 +35,19 @@ namespace Chopsticks.Dependencies.Resolutions
         protected Func<IDependencyContainer, object> Factory { get; init; } = factory;
 
 
-        /// <inheritdoc/>
-        public abstract void Dispose();
+        /// <summary>
+        /// Performs disposal of all instances managed by this resolution.
+        /// </summary>
+        public virtual void Dispose() { }
+
+        /// <summary>
+        /// Performs disposal of any instances that are exclusive to the specified container 
+        /// and that are managed by this resolution.
+        /// </summary>
+        /// <param name="container">The container whose exclusive instances managed by 
+        /// this resolution will be disposed.</param>
+        public virtual void DisposeFor(IDependencyContainer container) { }
+
 
         /// <summary>
         /// Provides an implementation to resolve the dependency.
