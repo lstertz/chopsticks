@@ -13,9 +13,7 @@ namespace Chopsticks.Dependencies.Resolutions
         DependencyResolution(contract, factory)
     {
         /// <inheritdoc/>
-        public override void Dispose()
-        {
-        }
+        public override void Dispose() { }
 
         /// <inheritdoc/>
         public override object Get(IDependencyContainer container) => Factory(container);
