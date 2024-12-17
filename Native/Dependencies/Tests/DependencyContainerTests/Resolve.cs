@@ -27,7 +27,6 @@ public class Resolve
             spec = new DependencySpecification()
             {
                 Contract = typeof(Mock.IContractA),
-                Implementation = typeof(Mock.ImplementationA),
                 ImplementationFactory = _ => new Mock.ImplementationA(),
                 Lifetime = lifetime
             };
@@ -49,26 +48,6 @@ public class Resolve
             return container;
         }
 
-        public static DependencyContainer ImplementationAsContractContainer(
-            out DependencyResolution resolution)
-        {
-            var spec = new DependencySpecification()
-            {
-                Contract = typeof(Mock.ImplementationA),
-                Implementation = typeof(Mock.ImplementationA),
-                ImplementationFactory = _ => new Mock.ImplementationA(),
-                Lifetime = DependencyLifetime.Singleton
-            };
-
-            var factory = Substitute.For<IDependencyResolutionFactory>();
-            resolution = ConfigureFactoryForSpec(factory, spec);
-
-            var container = new DependencyContainer(factory);
-            container.Register(spec, out _);
-
-            return container;
-        }
-
         public static DependencyContainer MultiRegistrationContainer(
             out DependencyResolution firstResolution,
             out DependencyResolution secondResolution,
@@ -78,14 +57,12 @@ public class Resolve
             var firstSpec = new DependencySpecification()
             {
                 Contract = typeof(Mock.IContractA),
-                Implementation = typeof(Mock.ImplementationA),
                 ImplementationFactory = _ => Substitute.For<Mock.IContractA>(),
                 Lifetime = DependencyLifetime.Singleton
             };
             var secondSpec = new DependencySpecification()
             {
                 Contract = typeof(Mock.IContractA),
-                Implementation = typeof(Mock.ImplementationA),
                 ImplementationFactory = _ => Substitute.For<Mock.IContractA>(),
                 Lifetime = DependencyLifetime.Singleton
             };
@@ -109,7 +86,6 @@ public class Resolve
             var spec = new DependencySpecification()
             {
                 Contract = typeof(Mock.IContractA),
-                Implementation = typeof(Mock.ImplementationA),
                 ImplementationFactory = _ => new Mock.ImplementationA(),
                 Lifetime = lifetime
             };
@@ -176,7 +152,7 @@ public class Resolve
     }
 
     [Test]
-    public void Resolve_DeregisteredContract_False()
+    public void Resolve_Deregistered_False()
     {
         // Set up
         var container = SetUp.StandardContainer(DependencyLifetime.Singleton, 
@@ -191,7 +167,7 @@ public class Resolve
     }
 
     [Test]
-    public void Resolve_DeregisteredContract_OutsNullDependency()
+    public void Resolve_Deregistered_OutsNullDependency()
     {
         // Set up
         var container = SetUp.StandardContainer(DependencyLifetime.Singleton, 
@@ -392,35 +368,7 @@ public class Resolve
 
 
     [Test]
-    public void Resolve_RegisteredImplementationAsContract_OutsFromResolution()
-    {
-        // Set up
-        var container = SetUp.ImplementationAsContractContainer(out var resolution);
-
-        // Act
-        container.Resolve(typeof(Mock.ImplementationA), out var resolvedImplementation);
-
-        // Assert
-        Assert.That(resolvedImplementation, Is.Not.Null);
-        Assert.That(resolution.Get(container), Is.EqualTo(resolvedImplementation));
-    }
-
-    [Test]
-    public void Resolve_RegisteredImplementationAsContract_True()
-    {
-        // Set up
-        var container = SetUp.ImplementationAsContractContainer(out _);
-
-        // Act
-        var resolved = container.Resolve(typeof(Mock.ImplementationA), out _);
-
-        // Assert
-        Assert.That(resolved, Is.True);
-    }
-
-
-    [Test]
-    public void Resolve_UnregisteredContract_False()
+    public void Resolve_Unregistered_False()
     {
         // Set up
         var container = SetUp.StandardContainer(DependencyLifetime.Singleton, out _, out _);
@@ -433,7 +381,7 @@ public class Resolve
     }
 
     [Test]
-    public void Resolve_UnregisteredContract_OutsNullDependency()
+    public void Resolve_Unregistered_OutsNullDependency()
     {
         // Set up
         var container = SetUp.StandardContainer(DependencyLifetime.Singleton, out _, out _);

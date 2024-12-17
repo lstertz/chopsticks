@@ -5,7 +5,8 @@ using System.Collections.Generic;
 namespace Chopsticks.Dependencies.Containers
 {
     /// <inheritdoc cref="IDependencyContainer"/>
-    public class DependencyContainer : IDependencyContainer, IDependencyResolutionProvider, IDisposable
+    public class DependencyContainer : IDependencyContainer, IDependencyResolutionProvider, 
+        IDisposable
     {
         /// <inheritdoc/>
         public bool InheritParentDependencies { get; set; } = true;
