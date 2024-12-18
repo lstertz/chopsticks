@@ -14,12 +14,6 @@ namespace Chopsticks.Dependencies.Resolutions
         IDisposable
     {
         /// <summary>
-        /// Specifies whether this resolution should be contained within its container, 
-        /// which should require it to be copied to any inheriting containers.
-        /// </summary>
-        public virtual bool IsContained => false;
-
-        /// <summary>
         /// The registration that identifies this resolution as a dependency of a 
         /// <see cref="IDependencyContainer"/>.
         /// </summary>

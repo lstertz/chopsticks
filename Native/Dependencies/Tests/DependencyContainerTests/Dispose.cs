@@ -15,9 +15,6 @@ public class Dispose
         public class ImplementationA : IContractA { }
     }
 
-    // TODO :: Test CanProvide to be false after disposal.
-    // TODO :: Test Resolve to be false and out null after disposal.
-
     public static class SetUp
     {
         public static DependencyContainer ChildContainer(
