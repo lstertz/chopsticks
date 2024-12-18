@@ -39,7 +39,6 @@ namespace Chopsticks.Dependencies.Containers
         public void Dispose()
         {
             // TODO :: Clean-up the Contained resolutions in parents.
-            throw new NotImplementedException();
         }
 
 
