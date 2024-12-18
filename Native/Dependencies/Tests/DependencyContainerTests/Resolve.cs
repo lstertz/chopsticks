@@ -280,7 +280,7 @@ public class Resolve
 
         // Assert
         Assert.That(resolvedImplementation, Is.Not.Null);
-        Assert.That(parentResolution.Get(parentContainer), Is.EqualTo(resolvedImplementation));
+        Assert.That(parentResolution.Get(container), Is.EqualTo(resolvedImplementation));
     }
 
     [Test]
@@ -298,32 +298,34 @@ public class Resolve
     }
 
     [Test]
-    public void Resolve_InheritedAfterDispose_False()
+    public void Resolve_InheritedAfterDispose_OutsFromParentResolution()
     {
         // Set up
         var container = SetUp.ChildContainer(
             out var parentContainer, out var parentResolution, out _, out _);
-
-        // Act
-        var resolved = container.Resolve(typeof(Mock.IContractA), out _);
-
-        // Assert
-        Assert.That(resolved, Is.False);
-    }
-
-    [Test]
-    public void Resolve_InheritedAfterDispose_OutsNull()
-    {
-        // Set up
-        var container = SetUp.ChildContainer(
-            out var parentContainer, out var parentResolution, out _, out _);
+        container.Dispose();
 
         // Act
         container.Resolve(typeof(Mock.IContractA), out var resolvedImplementation);
 
         // Assert
-        Assert.That(resolvedImplementation, Is.Null);
-        parentResolution.DidNotReceive().Get(container);
+        Assert.That(resolvedImplementation, Is.Not.Null);
+        Assert.That(parentResolution.Get(container), Is.EqualTo(resolvedImplementation));
+    }
+
+    [Test]
+    public void Resolve_InheritedAfterDispose_True()
+    {
+        // Set up
+        var container = SetUp.ChildContainer(
+            out var parentContainer, out var parentResolution, out _, out _);
+        container.Dispose();
+
+        // Act
+        var resolved = container.Resolve(typeof(Mock.IContractA), out _);
+
+        // Assert
+        Assert.That(resolved, Is.True);
     }
 
     [Test]

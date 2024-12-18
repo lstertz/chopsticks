@@ -24,6 +24,13 @@ namespace Chopsticks.Dependencies.Resolutions
         DependencyResolution? GetResolution(Type contract);
 
         /// <summary>
+        /// Provides all resolutions known to this provider.
+        /// </summary>
+        /// <returns>All resolutions. If there are none, 
+        /// the returned collection will be empty.</returns>
+        IEnumerable<DependencyResolution> GetResolutions();
+
+        /// <summary>
         /// Provides all resolutions that will resolve the specified contract.
         /// </summary>
         /// <param name="contract">The type of the contract.</param>

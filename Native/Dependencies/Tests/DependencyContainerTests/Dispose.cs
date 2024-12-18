@@ -101,7 +101,8 @@ public class Dispose
         container.Dispose();
 
         // Assert
-        Assert.Ignore();
+        firstResolution.Received().Dispose();
+        secondResolution.Received().Dispose();
     }
 
     [Test]
@@ -114,6 +115,6 @@ public class Dispose
         container.Dispose();
 
         // Assert
-        Assert.Ignore();
+        parentResolution.Received().DisposeFor(container);
     }
 }
