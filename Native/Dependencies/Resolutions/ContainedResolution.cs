@@ -22,6 +22,8 @@ namespace Chopsticks.Dependencies.Resolutions
         /// <inheritdoc/>
         public override void Dispose()
         {
+            base.Dispose();
+
             foreach (var instance in _instances.Values)
                 if (instance is IDisposable disposable)
                     disposable.Dispose();
@@ -41,12 +43,13 @@ namespace Chopsticks.Dependencies.Resolutions
 
 
         /// <inheritdoc/>
-        public override object Get(IDependencyContainer container)
+        public override object? Get(IDependencyContainer container)
         {
             if (!_instances.TryGetValue(container, out var instance))
             {
-                instance = Factory(container);
-                _instances.Add(container, instance);
+                instance = Factory?.Invoke(container);
+                if (instance is not null)
+                    _instances.Add(container, instance);
             }
 
             return instance;
