@@ -16,136 +16,133 @@ public class CanProvide
 
 
     [Test]
-    public void Contains_DeregisteredContractedImplementation_FalseForContract()
+    public void CanProvide_AfterDispose_False()
     {
         // Set up
         DependencyContainer container = new();
         DependencySpecification spec = new()
         {
             Contract = typeof(Mock.IContractA),
-            Implementation = typeof(Mock.ImplementationA),
             ImplementationFactory = _ => new()
         };
 
+        container.Register(spec, out var registration);
+        container.Dispose();
+
         // Act
-        container.Register(spec, out var registration)
-            .Deregister(registration);
-        var contains = (container as IDependencyResolutionProvider).CanProvide(spec.Contract);
+        var canProvide = (container as IDependencyResolutionProvider).CanProvide(spec.Contract);
 
         // Assert
-        Assert.That(contains, Is.False);
+        Assert.That(canProvide, Is.False);
+    }
+
+
+    [Test]
+    public void CanProvide_Deregistered_False()
+    {
+        // Set up
+        DependencyContainer container = new();
+        DependencySpecification spec = new()
+        {
+            Contract = typeof(Mock.IContractA),
+            ImplementationFactory = _ => new()
+        };
+
+        container.Register(spec, out var registration)
+            .Deregister(registration);
+
+        // Act
+        var canProvide = (container as IDependencyResolutionProvider).CanProvide(spec.Contract);
+
+        // Assert
+        Assert.That(canProvide, Is.False);
     }
 
     [Test]
-    public void Contains_DeregisteredFirstAfterMultipleRegistrations_True()
+    public void CanProvide_DeregisteredFirstAfterMultipleRegistrations_True()
     {
         // Set up
         DependencyContainer container = new();
         DependencySpecification spec1 = new()
         {
             Contract = typeof(Mock.IContractA),
-            Implementation = typeof(Mock.ImplementationA),
             ImplementationFactory = _ => new()
         };
         DependencySpecification spec2 = new()
         {
             Contract = typeof(Mock.IContractA),
-            Implementation = typeof(Mock.ImplementationA),
             ImplementationFactory = _ => new()
         };
 
-        // Act
         container.Register(spec1, out var registration1)
             .Register(spec2, out _)
             .Deregister(registration1);
-        var contains = (container as IDependencyResolutionProvider).CanProvide(spec2.Contract);
-
-        // Assert
-        Assert.That(contains, Is.True);
-    }
-
-    [Test]
-    public void Contains_DeregisteredImplementationForSelf_FalseForImplementation()
-    {
-        // Set up
-        DependencyContainer container = new();
-        DependencySpecification spec = new()
-        {
-            Contract = typeof(Mock.ImplementationA),
-            Implementation = typeof(Mock.ImplementationA),
-            ImplementationFactory = _ => new()
-        };
 
         // Act
-        container.Register(spec, out var registration)
-            .Deregister(registration);
-        var contains = (container as IDependencyResolutionProvider).CanProvide(
-            spec.Implementation);
+        var canProvide = (container as IDependencyResolutionProvider).CanProvide(spec2.Contract);
 
         // Assert
-        Assert.That(contains, Is.False);
+        Assert.That(canProvide, Is.True);
     }
 
     [Test]
-    public void Contains_DeregisteredMultipleAfterMultipleRegistrations_True()
+    public void CanProvide_DeregisteredMultipleAfterMultipleRegistrations_False()
     {
         // Set up
         DependencyContainer container = new();
         DependencySpecification spec1 = new()
         {
             Contract = typeof(Mock.IContractA),
-            Implementation = typeof(Mock.ImplementationA),
             ImplementationFactory = _ => new()
         };
         DependencySpecification spec2 = new()
         {
             Contract = typeof(Mock.IContractA),
-            Implementation = typeof(Mock.ImplementationA),
             ImplementationFactory = _ => new()
         };
 
-        // Act
         container.Register(spec1, out var registration1)
             .Register(spec2, out var registration2)
             .Deregister(registration1)
             .Deregister(registration2);
-        var contains = (container as IDependencyResolutionProvider).CanProvide(spec2.Contract);
+
+        // Act
+        var canProvide = (container as IDependencyResolutionProvider).CanProvide(spec2.Contract);
 
         // Assert
-        Assert.That(contains, Is.False);
+        Assert.That(canProvide, Is.False);
     }
 
     [Test]
-    public void Contains_DeregisteredSecondAfterMultipleRegistrations_True()
+    public void CanProvide_DeregisteredSecondAfterMultipleRegistrations_True()
     {
         // Set up
         DependencyContainer container = new();
         DependencySpecification spec1 = new()
         {
             Contract = typeof(Mock.IContractA),
-            Implementation = typeof(Mock.ImplementationA),
             ImplementationFactory = _ => new()
         };
         DependencySpecification spec2 = new()
         {
             Contract = typeof(Mock.IContractA),
-            Implementation = typeof(Mock.ImplementationA),
             ImplementationFactory = _ => new()
         };
 
-        // Act
         container.Register(spec1, out _)
             .Register(spec2, out var registration2)
             .Deregister(registration2);
-        var contains = (container as IDependencyResolutionProvider).CanProvide(spec1.Contract);
+
+        // Act
+        var canProvide = (container as IDependencyResolutionProvider).CanProvide(spec1.Contract);
 
         // Assert
-        Assert.That(contains, Is.True);
+        Assert.That(canProvide, Is.True);
     }
 
 
     [Test]
-    public void Contains_InheritanceEnabledAndAvailable_True()
+    public void CanProvide_InheritanceEnabledAndAvailable_True()
     {
         // Set up
         DependencyContainer parentContainer = new();
@@ -158,20 +155,20 @@ public class CanProvide
         DependencySpecification spec = new()
         {
             Contract = typeof(Mock.IContractA),
-            Implementation = typeof(Mock.ImplementationA),
             ImplementationFactory = _ => new()
         };
 
-        // Act
         parentContainer.Register(spec, out _);
-        var contains = (childContainer as IDependencyResolutionProvider).CanProvide(spec.Contract);
+
+        // Act
+        var canProvide = (childContainer as IDependencyResolutionProvider).CanProvide(spec.Contract);
 
         // Assert
-        Assert.That(contains, Is.True);
+        Assert.That(canProvide, Is.True);
     }
 
     [Test]
-    public void Contains_InheritanceEnabledAndUnavailable_False()
+    public void CanProvide_InheritanceEnabledAndUnavailable_False()
     {
         // Set up
         DependencyContainer parentContainer = new();
@@ -184,21 +181,21 @@ public class CanProvide
         DependencySpecification spec = new()
         {
             Contract = typeof(Mock.IContractA),
-            Implementation = typeof(Mock.ImplementationA),
             ImplementationFactory = _ => new()
         };
 
-        // Act
         parentContainer.Register(spec, out _);
-        var contains = (childContainer as IDependencyResolutionProvider).CanProvide(
+
+        // Act
+        var canProvide = (childContainer as IDependencyResolutionProvider).CanProvide(
             typeof(Mock.IContractB));
 
         // Assert
-        Assert.That(contains, Is.False);
+        Assert.That(canProvide, Is.False);
     }
 
     [Test]
-    public void Contains_InheritanceDisabledAndAvailable_False()
+    public void CanProvide_InheritanceDisabledAndAvailable_False()
     {
         // Set up
         DependencyContainer parentContainer = new();
@@ -211,120 +208,57 @@ public class CanProvide
         DependencySpecification spec = new()
         {
             Contract = typeof(Mock.IContractA),
-            Implementation = typeof(Mock.ImplementationA),
             ImplementationFactory = _ => new()
         };
 
-        // Act
         parentContainer.Register(spec, out _);
-        var contains = (childContainer as IDependencyResolutionProvider).CanProvide(spec.Contract);
+
+        // Act
+        var canProvide = (childContainer as IDependencyResolutionProvider).CanProvide(spec.Contract);
 
         // Assert
-        Assert.That(contains, Is.False);
+        Assert.That(canProvide, Is.False);
     }
 
 
     [Test]
-    public void Contains_RegisteredContractedImplementation_FalseForImplementation()
+    public void CanProvide_Registered_True()
     {
         // Set up
         DependencyContainer container = new();
         DependencySpecification spec = new()
         {
             Contract = typeof(Mock.IContractA),
-            Implementation = typeof(Mock.ImplementationA),
             ImplementationFactory = _ => new()
         };
 
-        // Act
         container.Register(spec, out _);
-        var contains = (container as IDependencyResolutionProvider).CanProvide(
-            spec.Implementation);
+
+        // Act
+        var canProvide = (container as IDependencyResolutionProvider).CanProvide(spec.Contract);
 
         // Assert
-        Assert.That(contains, Is.False);
+        Assert.That(canProvide, Is.True);
     }
 
     [Test]
-    public void Contains_RegisteredContractedImplementation_FalseForUnregisteredContract()
+    public void CanProvide_Unregistered_False()
     {
         // Set up
         DependencyContainer container = new();
         DependencySpecification spec = new()
         {
             Contract = typeof(Mock.IContractA),
-            Implementation = typeof(Mock.ImplementationA),
             ImplementationFactory = _ => new()
         };
 
-        // Act
         container.Register(spec, out _);
-        var contains = (container as IDependencyResolutionProvider).CanProvide(
+
+        // Act
+        var canProvide = (container as IDependencyResolutionProvider).CanProvide(
             typeof(Mock.IContractB));
 
         // Assert
-        Assert.That(contains, Is.False);
-    }
-
-    [Test]
-    public void Contains_RegisteredContractedImplementation_TrueForContract()
-    {
-        // Set up
-        DependencyContainer container = new();
-        DependencySpecification spec = new()
-        {
-            Contract = typeof(Mock.IContractA),
-            Implementation = typeof(Mock.ImplementationA),
-            ImplementationFactory = _ => new()
-        };
-
-        // Act
-        container.Register(spec, out _);
-        var contains = (container as IDependencyResolutionProvider).CanProvide(spec.Contract);
-
-        // Assert
-        Assert.That(contains, Is.True);
-    }
-
-    [Test]
-    public void Contains_RegisteredImplementationForSelf_FalseForContract()
-    {
-        // Set up
-        DependencyContainer container = new();
-        DependencySpecification spec = new()
-        {
-            Contract = typeof(Mock.ImplementationA),
-            Implementation = typeof(Mock.ImplementationA),
-            ImplementationFactory = _ => new()
-        };
-
-        // Act
-        container.Register(spec, out _);
-        var contains = (container as IDependencyResolutionProvider).CanProvide(
-            typeof(Mock.IContractA));
-
-        // Assert
-        Assert.That(contains, Is.False);
-    }
-
-    [Test]
-    public void Contains_RegisteredImplementationForSelf_TrueForImplementation()
-    {
-        // Set up
-        DependencyContainer container = new();
-        DependencySpecification spec = new()
-        {
-            Contract = typeof(Mock.ImplementationA),
-            Implementation = typeof(Mock.ImplementationA),
-            ImplementationFactory = _ => new()
-        };
-
-        // Act
-        container.Register(spec, out _);
-        var contains = (container as IDependencyResolutionProvider).CanProvide(
-            spec.Implementation);
-
-        // Assert
-        Assert.That(contains, Is.True);
+        Assert.That(canProvide, Is.False);
     }
 }

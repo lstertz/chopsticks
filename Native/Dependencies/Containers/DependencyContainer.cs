@@ -1,11 +1,13 @@
 ﻿using Chopsticks.Dependencies.Resolutions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Chopsticks.Dependencies.Containers
 {
     /// <inheritdoc cref="IDependencyContainer"/>
-    public class DependencyContainer : IDependencyContainer, IDependencyResolutionProvider, IDisposable
+    public class DependencyContainer : IDependencyContainer, IDependencyResolutionProvider, 
+        IDisposable
     {
         /// <inheritdoc/>
         public bool InheritParentDependencies { get; set; } = true;
@@ -37,8 +39,15 @@ namespace Chopsticks.Dependencies.Containers
         /// <inheritdoc/>
         public void Dispose()
         {
-            // TODO :: Clean-up the Contained resolutions in parents.
-            throw new NotImplementedException();
+            if (Parent != null)
+                foreach (var resolution in Parent.GetResolutions())
+                    resolution.DisposeFor(this);
+
+            foreach (var resolutions in _resolutions.Values)
+                foreach (var resolution in resolutions)
+                    resolution.Dispose();
+
+            _resolutions.Clear();
         }
 
 
@@ -131,6 +140,14 @@ namespace Chopsticks.Dependencies.Containers
                 return Parent?.GetResolution(contract);
 
             return resolutions[0];
+        }
+
+        /// <inheritdoc/>
+        IEnumerable<DependencyResolution> IDependencyResolutionProvider.GetResolutions()
+        {
+            foreach (var resolutions in _resolutions.Values)
+                foreach (var resolution in resolutions)
+                    yield return resolution;
         }
 
         /// <inheritdoc/>

@@ -1,5 +1,4 @@
-﻿using Chopsticks.Dependencies.Exceptions;
-using Chopsticks.Dependencies.Resolutions;
+﻿using Chopsticks.Dependencies.Resolutions;
 using System;
 using System.Collections.Generic;
 
@@ -51,8 +50,7 @@ namespace Chopsticks.Dependencies.Containers
         /// Resolves the dependency of the specified type with the 
         /// first registered implementation.
         /// </summary>
-        /// <param name="contract">The type of the contract that the implementation resolve, 
-        /// as a dependency.</param>
+        /// <param name="contract">The type of the contract to be resolved.</param>
         /// <param name="implementation">The resolving dependency implementation, or null 
         /// if it could not be resolved.</param>
         /// <returns>Whether the dependency was successfully resolved.</returns>
@@ -62,8 +60,7 @@ namespace Chopsticks.Dependencies.Containers
         /// <summary>
         /// Resolves the dependency of the specified type with all registered implementations.
         /// </summary>
-        /// <param name="contract">The type of the contract that the implementation resolve, 
-        /// as a dependency.</param>
+        /// <param name="contract">The type of the contract to be resolved.</param>
         /// <returns>The collection of all resolving implementations..</returns>
         IEnumerable<object> ResolveAll(Type contract);
 

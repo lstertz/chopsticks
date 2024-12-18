@@ -14,12 +14,6 @@ namespace Chopsticks.Dependencies.Resolutions
         IDisposable
     {
         /// <summary>
-        /// Specifies whether this resolution should be contained within its container, 
-        /// which should require it to be copied to any inheriting containers.
-        /// </summary>
-        public virtual bool IsContained => false;
-
-        /// <summary>
         /// The registration that identifies this resolution as a dependency of a 
         /// <see cref="IDependencyContainer"/>.
         /// </summary>
@@ -32,19 +26,23 @@ namespace Chopsticks.Dependencies.Resolutions
         /// <summary>
         /// The factory that provides implementations for resolution.
         /// </summary>
-        protected Func<IDependencyContainer, object> Factory { get; init; } = factory;
+        protected Func<IDependencyContainer, object>? Factory { get; set; } = factory;
 
 
         /// <summary>
-        /// Performs disposal of all instances managed by this resolution.
+        /// Performs disposal of all instances managed, either directly 
+        /// or indirectly through a factory, by this resolution.
         /// </summary>
-        public virtual void Dispose() { }
+        public virtual void Dispose() 
+        {
+            Factory = null;
+        }
 
         /// <summary>
         /// Performs disposal of any instances that are exclusive to the specified container 
-        /// and that are managed by this resolution.
+        /// and that are directly managed by this resolution.
         /// </summary>
-        /// <param name="container">The container whose exclusive instances managed by 
+        /// <param name="container">The container whose exclusive instances are directly managed by 
         /// this resolution will be disposed.</param>
         public virtual void DisposeFor(IDependencyContainer container) { }
 
@@ -54,7 +52,8 @@ namespace Chopsticks.Dependencies.Resolutions
         /// </summary>
         /// <param name="container">The container that will provide any constructed 
         /// implementation's own dependencies.</param>
-        /// <returns>An implementation that resolves the dependency.</returns>
-        public abstract object Get(IDependencyContainer container);
+        /// <returns>An implementation that resolves the dependency, or null 
+        /// if this resolution has been disposed of.</returns>
+        public abstract object? Get(IDependencyContainer container);
     }
 }

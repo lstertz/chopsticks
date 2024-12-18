@@ -28,6 +28,23 @@ public class Get
         }
     }
 
+
+    [Test]
+    public void Get_AfterDisposal_Null()
+    {
+        // Set up
+        var resolution = SetUp.StandardResolution(out var container, out var factory,
+            out var implementation);
+        resolution.Dispose();
+
+        // Act
+        var resultingImplementation = resolution.Get(container);
+
+        // Assert
+        factory.DidNotReceive().Invoke(container);
+        Assert.That(resultingImplementation, Is.Null);
+    }
+
     [Test]
     public void Get_FirstCall_InstantiatesFromFactory()
     {

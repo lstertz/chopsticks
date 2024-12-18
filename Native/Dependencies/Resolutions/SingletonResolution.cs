@@ -17,15 +17,16 @@ namespace Chopsticks.Dependencies.Resolutions
         /// <inheritdoc/>
         public override void Dispose()
         {
+            base.Dispose();
+
             if (_instance is IDisposable disposable)
                 disposable.Dispose();
 
             _instance = null;
-
         }
 
         /// <inheritdoc/>
-        public override object Get(IDependencyContainer container) =>
-            _instance ??= Factory(container);
+        public override object? Get(IDependencyContainer container) =>
+            _instance ??= Factory?.Invoke(container);
     }
 }

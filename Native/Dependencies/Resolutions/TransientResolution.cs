@@ -13,6 +13,7 @@ namespace Chopsticks.Dependencies.Resolutions
         DependencyResolution(contract, factory)
     {
         /// <inheritdoc/>
-        public override object Get(IDependencyContainer container) => Factory(container);
+        public override object? Get(IDependencyContainer container) => 
+            Factory?.Invoke(container);
     }
 }

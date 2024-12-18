@@ -1,6 +1,7 @@
 ﻿using Chopsticks.Dependencies.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 
 namespace Chopsticks.Dependencies.Containers
 {
@@ -15,69 +16,35 @@ namespace Chopsticks.Dependencies.Containers
             throw new NotImplementedException();
         }
 
-        public static IDependencyContainer Register<TImplementation>(
+        // TODO :: Re-evaluate with specifying only contract.
+
+        public static IDependencyContainer Register<TContract>(
             this IDependencyContainer container,
-            TImplementation dependency)
+            TContract dependency)
         {
             throw new NotImplementedException();
         }
 
-        public static IDependencyContainer Register<TImplementation>(
+        public static IDependencyContainer Register<TContract>(
             this IDependencyContainer container,
-            TImplementation dependency, out DependencyRegistration registration)
+            TContract dependency, out DependencyRegistration registration)
         {
             throw new NotImplementedException();
         }
 
-        public static IDependencyContainer Register<TImplementation>(
+        public static IDependencyContainer Register<TContract>(
             this IDependencyContainer container,
-            Func<IDependencyContainer, TImplementation> dependencyFactory,
+            Func<IDependencyContainer, TContract> dependencyFactory,
             DependencyLifetime lifetime = DependencyLifetime.Singleton)
         {
             throw new NotImplementedException();
         }
 
-        public static IDependencyContainer Register<TImplementation>(
+        public static IDependencyContainer Register<TContract>(
             this IDependencyContainer container,
-            Func<IDependencyContainer, TImplementation> dependencyFactory,
+            Func<IDependencyContainer, TContract> dependencyFactory,
             out DependencyRegistration registration,
             DependencyLifetime lifetime = DependencyLifetime.Singleton)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static IDependencyContainer Register<TImplementation, TContract>(
-            this IDependencyContainer container,
-            TContract singletonDependency) 
-            where TImplementation : TContract
-        {
-            throw new NotImplementedException();
-        }
-
-        public static IDependencyContainer Register<TImplementation, TContract>(
-            this IDependencyContainer container,
-            TContract singletonDependency, 
-            out DependencyRegistration registration)
-            where TImplementation : TContract
-        {
-            throw new NotImplementedException();
-        }
-
-        public static IDependencyContainer Register<TImplementation, TContract>(
-            this IDependencyContainer container,
-            Func<IDependencyContainer, TImplementation> dependencyFactory,
-            DependencyLifetime lifetime = DependencyLifetime.Singleton)
-             where TImplementation : TContract
-        {
-            throw new NotImplementedException();
-        }
-
-        public static IDependencyContainer Register<TImplementation, TContract>(
-            this IDependencyContainer container,
-            Func<IDependencyContainer, TImplementation> dependencyFactory,
-            out DependencyRegistration registration,
-            DependencyLifetime lifetime = DependencyLifetime.Singleton)
-             where TImplementation : TContract
         {
             throw new NotImplementedException();
         }
@@ -87,15 +54,14 @@ namespace Chopsticks.Dependencies.Containers
         /// Resolves the dependency of the specified type with the 
         /// first registered implementation.
         /// </summary>
-        /// <typeparam name="TDependency">The type of the dependency, either as the 
-        /// implementation type or the contract type that would be resolved.</typeparam>
+        /// <typeparam name="TContract">The type of the contract is to be resolved.</typeparam>
         /// <param name="container">The container resolving the dependency.</param>
         /// <param name="customErrorMessage">The custom message of the exception 
         /// thrown if the dependency could not be resolved.</param>
         /// <exception cref="MissingDependencyException">Thrown if the specified 
         /// dependency could not be resolved.</exception>
         /// <returns>The resolved dependency.</returns>
-        public static TDependency AssertiveResolve<TDependency>(
+        public static TContract AssertiveResolve<TContract>(
             this IDependencyContainer container, string? customErrorMessage = null)
         {
             throw new NotImplementedException();
@@ -106,8 +72,7 @@ namespace Chopsticks.Dependencies.Containers
         /// first registered implementation.
         /// </summary>
         /// <param name="container">The container resolving the dependency.</param>
-        /// <param name="contract">The type of the contract that the implementation resolve, 
-        /// as a dependency.</param>
+        /// <param name="contract">The type of the contract that is to be resolved.</param>
         /// <param name="customErrorMessage">The custom message of the exception 
         /// thrown if the dependency could not be resolved.</param>
         /// <exception cref="MissingDependencyException">Thrown if the specified 
@@ -123,15 +88,14 @@ namespace Chopsticks.Dependencies.Containers
         /// Resolves the dependency of the specified type with the 
         /// first registered implementation.
         /// </summary>
-        /// <typeparam name="TDependency">The type of the dependency, either as the 
-        /// implementation type or the contract type that would be resolved.</typeparam>
+        /// <typeparam name="TContract">The type of the contract is to be resolved.</typeparam>
         /// <param name="container">The container resolving the dependency.</param>
         /// <param name="implementation">The resolving dependency implementation, or null 
         /// if it could not be resolved.</param>
         /// <returns>Whether the dependency was successfully resolved.</returns>
-        public static bool Resolve<TDependency>(
+        public static bool Resolve<TContract>(
             this IDependencyContainer container, 
-            out TDependency? implementation)
+            out TContract? implementation)
         {
             throw new NotImplementedException();
         }
@@ -139,11 +103,10 @@ namespace Chopsticks.Dependencies.Containers
         /// <summary>
         /// Resolves the dependency of the specified type with all registered implementations.
         /// </summary>
-        /// <typeparam name="TDependency">The type of the dependency, either as the 
-        /// implementation type or the contract type that would be resolved.</typeparam>
+        /// <typeparam name="TContract">The type of the contract is to be resolved.</typeparam>
         /// <param name="container">The container resolving the dependency.</param>
         /// <returns>The collection of all resolving implementations..</returns>
-        public static IEnumerable<TDependency> ResolveAll<TDependency>(
+        public static IEnumerable<TContract> ResolveAll<TContract>(
             this IDependencyContainer container)
         {
             throw new NotImplementedException();
