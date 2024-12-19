@@ -14,7 +14,8 @@ public class Dispose
     public static class SetUp
     {
         public static DependencyContainer ChildContainer(
-            out DependencyResolution parentResolution)
+            out DependencyResolution parentResolution,
+            bool makeParentAsGrandparent = false)
         {
             var spec = new DependencySpecification()
             {
@@ -27,11 +28,18 @@ public class Dispose
             parentResolution = ConfigureFactoryForSpec(parentFactory, parentContainer, spec);
             parentContainer.Register(spec, out _);
 
+            DependencyContainer? intermediaryParent = makeParentAsGrandparent ?
+                new(Substitute.For<IDependencyResolutionFactory>())
+                {
+                    InheritParentDependencies = true,
+                    Parent = parentContainer
+                } : null;
+
             var childFactory = Substitute.For<IDependencyResolutionFactory>();
             var childContainer = new DependencyContainer(childFactory)
             {
                 InheritParentDependencies = true,
-                Parent = parentContainer
+                Parent = intermediaryParent ?? parentContainer
             };
             parentResolution.Get(childContainer)
                 .Returns(spec.ImplementationFactory(childContainer));
@@ -84,6 +92,19 @@ public class Dispose
         }
     }
 
+
+    [Test]
+    public void Dispose_WithGrandparentResolutions_DisposesGrandparentResolutionForSelf()
+    {
+        // Set up
+        var container = SetUp.ChildContainer(out var grandparentResolution, true);
+
+        // Act
+        container.Dispose();
+
+        // Assert
+        grandparentResolution.Received().DisposeFor(container);
+    }
 
     [Test]
     public void Dispose_WithOwnResolutions_DisposesResolutions()
