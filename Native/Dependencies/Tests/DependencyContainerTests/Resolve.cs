@@ -142,6 +142,36 @@ public class Resolve
 
 
     [Test]
+    public void Resolve_ChildWithoutInheritance_False()
+    {
+        // Set up
+        var container = SetUp.ChildContainer(out _, out _, out _, out _);
+        container.InheritParentDependencies = false;
+
+        // Act
+        var resolved = container.Resolve(typeof(Mock.IContractA), out _);
+
+        // Assert
+        Assert.That(resolved, Is.False);
+    }
+
+    [Test]
+    public void Resolve_ChildWithoutInheritance_OutsNull()
+    {
+        // Set up
+        var container = SetUp.ChildContainer(out _, out var parentResolution, out _, out _);
+        container.InheritParentDependencies = false;
+
+        // Act
+        container.Resolve(typeof(Mock.IContractA), out var resolvedImplementation);
+
+        // Assert
+        Assert.That(resolvedImplementation, Is.Null);
+        parentResolution.DidNotReceive().Get(container);
+    }
+
+
+    [Test]
     public void Resolve_DeregisteredAllAfterMultiRegistration_False()
     {
         // Set up

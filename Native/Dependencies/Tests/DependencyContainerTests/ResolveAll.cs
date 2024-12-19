@@ -27,9 +27,14 @@ public class ResolveAll
                 Contract = typeof(Mock.IContractA),
                 ImplementationFactory = _ => Substitute.For<Mock.IContractA>()
             };
-            var parentSpec2 = new DependencySpecification()  // For verifying exclusion.
+            var parentSpec2 = new DependencySpecification()
             {
-                Contract = typeof(Mock.IContractB),
+                Contract = typeof(Mock.IContractA),
+                ImplementationFactory = _ => Substitute.For<Mock.IContractA>()
+            };
+            var excludedParentSpec = new DependencySpecification()
+            {
+                Contract = typeof(Mock.IContractB),  // This contract is excluded when resolving A.
                 ImplementationFactory = _ => Substitute.For<Mock.IContractB>()
             };
             var childSpec = new DependencySpecification()
@@ -44,7 +49,10 @@ public class ResolveAll
                 parentContainer, parentSpec1);
             parentResolution2 = ConfigureFactoryForSpec(parentFactory, 
                 parentContainer, parentSpec2);
-            parentContainer.Register(parentSpec1, out _);
+            ConfigureFactoryForSpec(parentFactory, parentContainer, excludedParentSpec);
+            parentContainer.Register(parentSpec1, out _)
+                .Register(parentSpec2, out _)
+                .Register(excludedParentSpec, out _);
 
             var childFactory = Substitute.For<IDependencyResolutionFactory>();
             var childContainer = new DependencyContainer(childFactory)
@@ -57,6 +65,7 @@ public class ResolveAll
             parentResolution2.Get(childContainer)
                 .Returns(parentSpec2.ImplementationFactory(childContainer));
             childResolution = ConfigureFactoryForSpec(childFactory, childContainer, childSpec);
+            childContainer.Register(childSpec, out _);
 
             return childContainer;
         }
@@ -77,9 +86,9 @@ public class ResolveAll
                 Contract = typeof(Mock.IContractA),
                 ImplementationFactory = _ => Substitute.For<Mock.IContractA>()
             };
-            var thirdSpec = new DependencySpecification()  // For verifying exclusion.
+            var excludedSpec = new DependencySpecification()
             {
-                Contract = typeof(Mock.IContractB),
+                Contract = typeof(Mock.IContractB),  // This contract is excluded when resolving A.
                 ImplementationFactory = _ => Substitute.For<Mock.IContractB>()
             };
 
@@ -87,11 +96,11 @@ public class ResolveAll
             var container = new DependencyContainer(factory);
             firstResolution = ConfigureFactoryForSpec(factory, container, firstSpec);
             secondResolution = ConfigureFactoryForSpec(factory, container, secondSpec);
-            ConfigureFactoryForSpec(factory, container, thirdSpec);
+            ConfigureFactoryForSpec(factory, container, excludedSpec);
             container
                 .Register(firstSpec, out firstRegistration)
                 .Register(secondSpec, out secondRegistration)
-                .Register(thirdSpec, out _);
+                .Register(excludedSpec, out _);
 
             return container;
         }
@@ -128,6 +137,22 @@ public class ResolveAll
 
         // Assert
         Assert.That(instances, Is.Empty);
+    }
+
+
+    [Test]
+    public void ResolveAll_ChildWithoutInheritance_ReturnsOnlyOwnInstances()
+    {
+        // Set up
+        var container = SetUp.ChildContainer(out _, out _, out var childResolution);
+        container.InheritParentDependencies = false;
+
+        // Act
+        var instances = container.ResolveAll(typeof(Mock.IContractA)).ToArray();
+
+        // Assert
+        Assert.That(instances.Length, Is.EqualTo(1));
+        Assert.That(childResolution.Get(container), Is.EqualTo(instances[0]));
     }
 
 
@@ -212,6 +237,23 @@ public class ResolveAll
         Assert.That(instances.Length, Is.EqualTo(2));
         Assert.That(parentResolution1.Get(container), Is.EqualTo(instances[0]));
         Assert.That(parentResolution2.Get(container), Is.EqualTo(instances[1]));
+    }
+
+
+    [Test]
+    public void ResolveAll_NullReturningResolution_ReturnsNonNullInstances()
+    {
+        // Set up
+        var container = SetUp.StandardContainer(out var firstResolution, out var secondResolution,
+            out _, out _);
+        firstResolution.Get(container).Returns(null);
+
+        // Act
+        var instances = container.ResolveAll(typeof(Mock.IContractA)).ToArray();
+
+        // Assert
+        Assert.That(instances.Length, Is.EqualTo(1));
+        Assert.That(secondResolution.Get(container), Is.EqualTo(instances[0]));
     }
 
 

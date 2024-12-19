@@ -122,7 +122,13 @@ namespace Chopsticks.Dependencies.Containers
         /// <inheritdoc/>
         public IEnumerable<object> ResolveAll(Type contract)
         {
-            throw new NotImplementedException();
+            var resolutions = (this as IDependencyResolutionProvider).GetResolutions(contract);
+            foreach (var resolution in resolutions)
+            {
+                var instance = resolution.Get(this);
+                if (instance != null)
+                    yield return instance;
+            }
         }
 
 
@@ -130,16 +136,21 @@ namespace Chopsticks.Dependencies.Containers
         DependencyResolution? IDependencyResolutionProvider.GetResolution(Type contract)
         {
             if (!_resolutions.TryGetValue(contract, out var resolutions))
-                return Parent?.GetResolution(contract);
+                return InheritParentDependencies ? Parent?.GetResolution(contract) : null;
 
             return resolutions[0];
         }
 
         /// <inheritdoc/>
-        IEnumerable<DependencyResolution> IDependencyResolutionProvider.GetResolutions()
+        IEnumerable<DependencyResolution> IDependencyResolutionProvider.GetResolutions(
+            Type contract)
         {
-            foreach (var resolutions in _resolutions.Values)
+            if (_resolutions.TryGetValue(contract, out var resolutions))
                 foreach (var resolution in resolutions)
+                    yield return resolution;
+
+            if (Parent != null && InheritParentDependencies)
+                foreach (var resolution in Parent.GetResolutions(contract))
                     yield return resolution;
         }
 
