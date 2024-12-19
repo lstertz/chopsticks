@@ -1,7 +1,6 @@
 ﻿using Chopsticks.Dependencies.Resolutions;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Chopsticks.Dependencies.Containers
 {
@@ -122,12 +121,6 @@ namespace Chopsticks.Dependencies.Containers
 
         /// <inheritdoc/>
         public IEnumerable<object> ResolveAll(Type contract)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <inheritdoc/>
-        public void ResolveAllSingletons()
         {
             throw new NotImplementedException();
         }

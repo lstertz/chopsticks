@@ -63,13 +63,5 @@ namespace Chopsticks.Dependencies.Containers
         /// <param name="contract">The type of the contract to be resolved.</param>
         /// <returns>The collection of all resolving implementations..</returns>
         IEnumerable<object> ResolveAll(Type contract);
-
-        /// <summary>
-        /// Resolves all dependencies that will be singletons within the scope of this container, 
-        /// which will include those registered with a lifetime of either
-        /// <see cref="DependencyLifetime.Singleton"/> or 
-        /// <see cref="DependencyLifetime.Contained"/>.
-        /// </summary>
-        void ResolveAllSingletons();
     }
 }
