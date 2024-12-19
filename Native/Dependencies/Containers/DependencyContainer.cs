@@ -1,7 +1,6 @@
 ﻿using Chopsticks.Dependencies.Resolutions;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Chopsticks.Dependencies.Containers
 {
@@ -40,7 +39,7 @@ namespace Chopsticks.Dependencies.Containers
         public void Dispose()
         {
             if (Parent != null)
-                foreach (var resolution in Parent.GetResolutions())
+                foreach (var resolution in Parent.GetResolutionsForDisposal())
                     resolution.DisposeFor(this);
 
             foreach (var resolutions in _resolutions.Values)
@@ -123,13 +122,13 @@ namespace Chopsticks.Dependencies.Containers
         /// <inheritdoc/>
         public IEnumerable<object> ResolveAll(Type contract)
         {
-            throw new NotImplementedException();
-        }
-
-        /// <inheritdoc/>
-        public void ResolveAllSingletons()
-        {
-            throw new NotImplementedException();
+            var resolutions = (this as IDependencyResolutionProvider).GetResolutions(contract);
+            foreach (var resolution in resolutions)
+            {
+                var instance = resolution.Get(this);
+                if (instance != null)
+                    yield return instance;
+            }
         }
 
 
@@ -137,25 +136,34 @@ namespace Chopsticks.Dependencies.Containers
         DependencyResolution? IDependencyResolutionProvider.GetResolution(Type contract)
         {
             if (!_resolutions.TryGetValue(contract, out var resolutions))
-                return Parent?.GetResolution(contract);
+                return InheritParentDependencies ? Parent?.GetResolution(contract) : null;
 
             return resolutions[0];
-        }
-
-        /// <inheritdoc/>
-        IEnumerable<DependencyResolution> IDependencyResolutionProvider.GetResolutions()
-        {
-            foreach (var resolutions in _resolutions.Values)
-                foreach (var resolution in resolutions)
-                    yield return resolution;
         }
 
         /// <inheritdoc/>
         IEnumerable<DependencyResolution> IDependencyResolutionProvider.GetResolutions(
             Type contract)
         {
-            // TODO :: Implement.
-            return [];
+            if (_resolutions.TryGetValue(contract, out var resolutions))
+                foreach (var resolution in resolutions)
+                    yield return resolution;
+
+            if (Parent != null && InheritParentDependencies)
+                foreach (var resolution in Parent.GetResolutions(contract))
+                    yield return resolution;
+        }
+
+        /// <inheritdoc/>
+        IEnumerable<DependencyResolution> IDependencyResolutionProvider.GetResolutionsForDisposal()
+        {
+            foreach (var resolutions in _resolutions.Values)
+                foreach (var resolution in resolutions)
+                    yield return resolution;
+
+            if (Parent != null)
+                foreach (var resolution in Parent.GetResolutionsForDisposal())
+                    yield return resolution;
         }
     }
 }

@@ -10,8 +10,6 @@ public class CanProvide
         public interface IContractA { }
 
         public interface IContractB { }
-
-        public class ImplementationA : IContractA { }
     }
 
 

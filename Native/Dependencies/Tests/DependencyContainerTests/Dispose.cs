@@ -9,37 +9,42 @@ public class Dispose
     public static class Mock
     {
         public interface IContractA { }
-
-        public interface IContractB { }
-
-        public class ImplementationA : IContractA { }
     }
 
     public static class SetUp
     {
         public static DependencyContainer ChildContainer(
-            out DependencyResolution parentResolution)
+            out DependencyResolution parentResolution,
+            bool makeParentAsGrandparent = false)
         {
             var spec = new DependencySpecification()
             {
                 Contract = typeof(Mock.IContractA),
-                ImplementationFactory = _ => new Mock.ImplementationA()
+                ImplementationFactory = _ => Substitute.For<Mock.IContractA>()
             };
 
             var parentFactory = Substitute.For<IDependencyResolutionFactory>();
-            parentResolution = ConfigureFactoryForSpec(parentFactory, spec);
-
             var parentContainer = new DependencyContainer(parentFactory);
+            parentResolution = ConfigureFactoryForSpec(parentFactory, parentContainer, spec);
             parentContainer.Register(spec, out _);
 
+            DependencyContainer? intermediaryParent = makeParentAsGrandparent ?
+                new(Substitute.For<IDependencyResolutionFactory>())
+                {
+                    InheritParentDependencies = true,
+                    Parent = parentContainer
+                } : null;
+
             var childFactory = Substitute.For<IDependencyResolutionFactory>();
-            var container = new DependencyContainer(childFactory)
+            var childContainer = new DependencyContainer(childFactory)
             {
                 InheritParentDependencies = true,
-                Parent = parentContainer
+                Parent = intermediaryParent ?? parentContainer
             };
+            parentResolution.Get(childContainer)
+                .Returns(spec.ImplementationFactory(childContainer));
 
-            return container;
+            return childContainer;
         }
 
         public static DependencyContainer StandardContainer(
@@ -58,10 +63,9 @@ public class Dispose
             };
 
             var factory = Substitute.For<IDependencyResolutionFactory>();
-            firstResolution = ConfigureFactoryForSpec(factory, firstSpec);
-            secondResolution = ConfigureFactoryForSpec(factory, secondSpec);
-
             var container = new DependencyContainer(factory);
+            firstResolution = ConfigureFactoryForSpec(factory, container, firstSpec);
+            secondResolution = ConfigureFactoryForSpec(factory, container, secondSpec);
             container
                 .Register(firstSpec, out _)
                 .Register(secondSpec, out _);
@@ -72,6 +76,7 @@ public class Dispose
 
         private static DependencyResolution ConfigureFactoryForSpec(
             IDependencyResolutionFactory factory,
+            IDependencyContainer container,
             DependencySpecification spec)
         {
             var mockDependency = Substitute.For<Mock.IContractA>();
@@ -79,6 +84,7 @@ public class Dispose
             var resolution = Substitute.For<DependencyResolution>(
                 spec.Contract,
                 spec.ImplementationFactory);
+            resolution.Get(container).Returns(mockDependency);
 
             factory.BuildResolutionFor(spec).Returns(_ => resolution);
 
@@ -86,6 +92,19 @@ public class Dispose
         }
     }
 
+
+    [Test]
+    public void Dispose_WithGrandparentResolutions_DisposesGrandparentResolutionForSelf()
+    {
+        // Set up
+        var container = SetUp.ChildContainer(out var grandparentResolution, true);
+
+        // Act
+        container.Dispose();
+
+        // Assert
+        grandparentResolution.Received().DisposeFor(container);
+    }
 
     [Test]
     public void Dispose_WithOwnResolutions_DisposesResolutions()
