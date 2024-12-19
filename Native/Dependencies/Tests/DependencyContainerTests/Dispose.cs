@@ -9,10 +9,6 @@ public class Dispose
     public static class Mock
     {
         public interface IContractA { }
-
-        public interface IContractB { }
-
-        public class ImplementationA : IContractA { }
     }
 
     public static class SetUp
@@ -23,23 +19,24 @@ public class Dispose
             var spec = new DependencySpecification()
             {
                 Contract = typeof(Mock.IContractA),
-                ImplementationFactory = _ => new Mock.ImplementationA()
+                ImplementationFactory = _ => Substitute.For<Mock.IContractA>()
             };
 
             var parentFactory = Substitute.For<IDependencyResolutionFactory>();
-            parentResolution = ConfigureFactoryForSpec(parentFactory, spec);
-
             var parentContainer = new DependencyContainer(parentFactory);
+            parentResolution = ConfigureFactoryForSpec(parentFactory, parentContainer, spec);
             parentContainer.Register(spec, out _);
 
             var childFactory = Substitute.For<IDependencyResolutionFactory>();
-            var container = new DependencyContainer(childFactory)
+            var childContainer = new DependencyContainer(childFactory)
             {
                 InheritParentDependencies = true,
                 Parent = parentContainer
             };
+            parentResolution.Get(childContainer)
+                .Returns(spec.ImplementationFactory(childContainer));
 
-            return container;
+            return childContainer;
         }
 
         public static DependencyContainer StandardContainer(
@@ -58,10 +55,9 @@ public class Dispose
             };
 
             var factory = Substitute.For<IDependencyResolutionFactory>();
-            firstResolution = ConfigureFactoryForSpec(factory, firstSpec);
-            secondResolution = ConfigureFactoryForSpec(factory, secondSpec);
-
             var container = new DependencyContainer(factory);
+            firstResolution = ConfigureFactoryForSpec(factory, container, firstSpec);
+            secondResolution = ConfigureFactoryForSpec(factory, container, secondSpec);
             container
                 .Register(firstSpec, out _)
                 .Register(secondSpec, out _);
@@ -72,6 +68,7 @@ public class Dispose
 
         private static DependencyResolution ConfigureFactoryForSpec(
             IDependencyResolutionFactory factory,
+            IDependencyContainer container,
             DependencySpecification spec)
         {
             var mockDependency = Substitute.For<Mock.IContractA>();
@@ -79,6 +76,7 @@ public class Dispose
             var resolution = Substitute.For<DependencyResolution>(
                 spec.Contract,
                 spec.ImplementationFactory);
+            resolution.Get(container).Returns(mockDependency);
 
             factory.BuildResolutionFor(spec).Returns(_ => resolution);
 
