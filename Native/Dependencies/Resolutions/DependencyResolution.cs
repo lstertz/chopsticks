@@ -10,7 +10,7 @@ namespace Chopsticks.Dependencies.Resolutions
     /// <param name="contract">The contract that this resolution fulfills.</param>
     /// <param name="factory">The factory that provides implementations for resolution.</param>
     public abstract class DependencyResolution(Type contract,
-        Func<IDependencyContainer, object> factory) :
+        Func<IDependencyContainer, object?> factory) :
         IDisposable
     {
         /// <summary>
@@ -26,7 +26,7 @@ namespace Chopsticks.Dependencies.Resolutions
         /// <summary>
         /// The factory that provides implementations for resolution.
         /// </summary>
-        protected Func<IDependencyContainer, object>? Factory { get; set; } = factory;
+        protected Func<IDependencyContainer, object?>? Factory { get; set; } = factory;
 
 
         /// <summary>

@@ -9,7 +9,7 @@ namespace Chopsticks.Dependencies.Resolutions
     /// of <see cref="DependencyLifetime.Transient"/>.
     /// </remarks>
     public class TransientResolution(Type contract,
-        Func<IDependencyContainer, object> factory) :
+        Func<IDependencyContainer, object?> factory) :
         DependencyResolution(contract, factory)
     {
         /// <inheritdoc/>
