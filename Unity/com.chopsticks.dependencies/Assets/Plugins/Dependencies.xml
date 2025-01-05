@@ -46,13 +46,13 @@
         <member name="M:Chopsticks.Dependencies.Containers.DependencyContainer.ResolveAll(System.Type)">
             <inheritdoc/>
         </member>
-        <member name="M:Chopsticks.Dependencies.Containers.DependencyContainer.ResolveAllSingletons">
-            <inheritdoc/>
-        </member>
         <member name="M:Chopsticks.Dependencies.Containers.DependencyContainer.Chopsticks#Dependencies#Resolutions#IDependencyResolutionProvider#GetResolution(System.Type)">
             <inheritdoc/>
         </member>
         <member name="M:Chopsticks.Dependencies.Containers.DependencyContainer.Chopsticks#Dependencies#Resolutions#IDependencyResolutionProvider#GetResolutions(System.Type)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Chopsticks.Dependencies.Containers.DependencyContainer.Chopsticks#Dependencies#Resolutions#IDependencyResolutionProvider#GetResolutionsForDisposal">
             <inheritdoc/>
         </member>
         <member name="T:Chopsticks.Dependencies.Containers.DependencyRegistration">
@@ -74,15 +74,7 @@
         <member name="P:Chopsticks.Dependencies.Containers.DependencySpecification.Contract">
             <summary>
             The type of the contract, representing the dependency, 
-            that is fulfilled by the <see cref="P:Chopsticks.Dependencies.Containers.DependencySpecification.Implementation"/>.
-            </summary>
-            <remarks>
-            This may be the same as <see cref="P:Chopsticks.Dependencies.Containers.DependencySpecification.Implementation"/>.
-            </remarks>
-        </member>
-        <member name="P:Chopsticks.Dependencies.Containers.DependencySpecification.Implementation">
-            <summary>
-            The type of the implementation that fulfills this dependency.
+            that is fulfilled by an implementation.
             </summary>
         </member>
         <member name="P:Chopsticks.Dependencies.Containers.DependencySpecification.Lifetime">
@@ -92,7 +84,7 @@
         </member>
         <member name="P:Chopsticks.Dependencies.Containers.DependencySpecification.ImplementationFactory">
             <summary>
-            The factory method that can produce an instance of the <see cref="P:Chopsticks.Dependencies.Containers.DependencySpecification.Implementation"/> to 
+            The factory method that can produce an instance of an implementation to 
             resolve this dependency.
             </summary>
         </member>
@@ -145,8 +137,7 @@
             Resolves the dependency of the specified type with the 
             first registered implementation.
             </summary>
-            <param name="contract">The type of the contract that the implementation resolve, 
-            as a dependency.</param>
+            <param name="contract">The type of the contract to be resolved.</param>
             <param name="implementation">The resolving dependency implementation, or null 
             if it could not be resolved.</param>
             <returns>Whether the dependency was successfully resolved.</returns>
@@ -155,30 +146,80 @@
             <summary>
             Resolves the dependency of the specified type with all registered implementations.
             </summary>
-            <param name="contract">The type of the contract that the implementation resolve, 
-            as a dependency.</param>
+            <param name="contract">The type of the contract to be resolved.</param>
             <returns>The collection of all resolving implementations..</returns>
         </member>
-        <member name="M:Chopsticks.Dependencies.Containers.IDependencyContainer.ResolveAllSingletons">
+        <member name="T:Chopsticks.Dependencies.Containers.IDependencyContainerExtensions">
             <summary>
-            Resolves all dependencies that will be singletons within the scope of this container, 
-            which will include those registered with a lifetime of either
-            <see cref="F:Chopsticks.Dependencies.DependencyLifetime.Singleton"/> or 
-            <see cref="F:Chopsticks.Dependencies.DependencyLifetime.Contained"/>.
+            Extensions for <see cref="T:Chopsticks.Dependencies.Containers.IDependencyContainer"/>.
             </summary>
+        </member>
+        <member name="M:Chopsticks.Dependencies.Containers.IDependencyContainerExtensions.Register(Chopsticks.Dependencies.Containers.IDependencyContainer,Chopsticks.Dependencies.Containers.DependencySpecification)">
+            <summary>
+            Registers the dependency defined by the given specification.
+            </summary>
+            <param name="container">The container registering the dependency.</param>
+            <param name="specification">The specification that defines the 
+            dependency to be registered.</param>
+            <returns>This container, to chain additional manipulations.</returns>
+        </member>
+        <member name="M:Chopsticks.Dependencies.Containers.IDependencyContainerExtensions.Register``1(Chopsticks.Dependencies.Containers.IDependencyContainer,``0)">
+            <summary>
+            Registers the dependency defined by the given instance of the dependency, 
+            with a lifetime of <see cref="F:Chopsticks.Dependencies.DependencyLifetime.Singleton"/>.
+            </summary>
+            <param name="container">The container registering the dependency.</param>
+            <param name="dependency">The instance of the dependency.</param>
+            <returns>This container, to chain additional manipulations.</returns>
+        </member>
+        <member name="M:Chopsticks.Dependencies.Containers.IDependencyContainerExtensions.Register``1(Chopsticks.Dependencies.Containers.IDependencyContainer,``0,Chopsticks.Dependencies.Containers.DependencyRegistration@)">
+            <summary>
+            Registers the dependency defined by the given instance of the dependency, 
+            with a lifetime of <see cref="F:Chopsticks.Dependencies.DependencyLifetime.Singleton"/>.
+            </summary>
+            <param name="container">The container registering the dependency.</param>
+            <param name="dependency">The instance of the dependency.</param>
+            <param name="registration">The registration that can identify the dependency for 
+            deregistration by <see cref="M:Chopsticks.Dependencies.Containers.IDependencyContainer.Deregister(Chopsticks.Dependencies.Containers.DependencyRegistration)"/>
+            </param>
+            <returns>This container, to chain additional manipulations.</returns>
+        </member>
+        <member name="M:Chopsticks.Dependencies.Containers.IDependencyContainerExtensions.Register``1(Chopsticks.Dependencies.Containers.IDependencyContainer,System.Func{Chopsticks.Dependencies.Containers.IDependencyContainer,``0},Chopsticks.Dependencies.DependencyLifetime)">
+            <summary>
+            Registers the dependency defined by the given implementation factory.
+            </summary>
+            <param name="container">The container registering the dependency.</param>
+            <param name="implementationFactory">The factory for producing 
+            resolving implementations.</param>
+            <param name="lifetime">The lifetime of that the registered 
+            dependency will have.</param>
+            <returns>This container, to chain additional manipulations.</returns>
+        </member>
+        <member name="M:Chopsticks.Dependencies.Containers.IDependencyContainerExtensions.Register``1(Chopsticks.Dependencies.Containers.IDependencyContainer,System.Func{Chopsticks.Dependencies.Containers.IDependencyContainer,``0},Chopsticks.Dependencies.Containers.DependencyRegistration@,Chopsticks.Dependencies.DependencyLifetime)">
+            <summary>
+            Registers the dependency defined by the given implementation factory.
+            </summary>
+            <param name="container">The container registering the dependency.</param>
+            <param name="implementationFactory">The factory for producing 
+            resolving implementations.</param>
+            <param name="registration">The registration that can identify the dependency for 
+            deregistration by <see cref="M:Chopsticks.Dependencies.Containers.IDependencyContainer.Deregister(Chopsticks.Dependencies.Containers.DependencyRegistration)"/>
+            </param>
+            <param name="lifetime">The lifetime of that the registered 
+            dependency will have.</param>
+            <returns>This container, to chain additional manipulations.</returns>
         </member>
         <member name="M:Chopsticks.Dependencies.Containers.IDependencyContainerExtensions.AssertiveResolve``1(Chopsticks.Dependencies.Containers.IDependencyContainer,System.String)">
             <summary>
             Resolves the dependency of the specified type with the 
             first registered implementation.
             </summary>
-            <typeparam name="TDependency">The type of the dependency, either as the 
-            implementation type or the contract type that would be resolved.</typeparam>
+            <typeparam name="TContract">The type of the contract is to be resolved.</typeparam>
             <param name="container">The container resolving the dependency.</param>
             <param name="customErrorMessage">The custom message of the exception 
-            thrown if the dependency could not be resolved.</param>
+            thrown if the dependency could not be resolved or was resolved as null.</param>
             <exception cref="T:Chopsticks.Dependencies.Exceptions.MissingDependencyException">Thrown if the specified 
-            dependency could not be resolved.</exception>
+            dependency could not be resolved or was resolved as null.</exception>
             <returns>The resolved dependency.</returns>
         </member>
         <member name="M:Chopsticks.Dependencies.Containers.IDependencyContainerExtensions.AssertiveResolve(Chopsticks.Dependencies.Containers.IDependencyContainer,System.Type,System.String)">
@@ -187,8 +228,7 @@
             first registered implementation.
             </summary>
             <param name="container">The container resolving the dependency.</param>
-            <param name="contract">The type of the contract that the implementation resolve, 
-            as a dependency.</param>
+            <param name="contract">The type of the contract that is to be resolved.</param>
             <param name="customErrorMessage">The custom message of the exception 
             thrown if the dependency could not be resolved.</param>
             <exception cref="T:Chopsticks.Dependencies.Exceptions.MissingDependencyException">Thrown if the specified 
@@ -200,8 +240,7 @@
             Resolves the dependency of the specified type with the 
             first registered implementation.
             </summary>
-            <typeparam name="TDependency">The type of the dependency, either as the 
-            implementation type or the contract type that would be resolved.</typeparam>
+            <typeparam name="TContract">The type of the contract is to be resolved.</typeparam>
             <param name="container">The container resolving the dependency.</param>
             <param name="implementation">The resolving dependency implementation, or null 
             if it could not be resolved.</param>
@@ -211,8 +250,7 @@
             <summary>
             Resolves the dependency of the specified type with all registered implementations.
             </summary>
-            <typeparam name="TDependency">The type of the dependency, either as the 
-            implementation type or the contract type that would be resolved.</typeparam>
+            <typeparam name="TContract">The type of the contract is to be resolved.</typeparam>
             <param name="container">The container resolving the dependency.</param>
             <returns>The collection of all resolving implementations..</returns>
         </member>
@@ -302,6 +340,13 @@
             <summary>
             Represents a failure to resolve a required dependency.
             </summary>
+            <param name="message">The message that describes the error.</param>
+        </member>
+        <member name="M:Chopsticks.Dependencies.Exceptions.MissingDependencyException.#ctor(System.String)">
+            <summary>
+            Represents a failure to resolve a required dependency.
+            </summary>
+            <param name="message">The message that describes the error.</param>
         </member>
         <member name="T:Chopsticks.Dependencies.Resolutions.ContainedResolution">
             <inheritdoc/>
@@ -316,9 +361,6 @@
             This resolution assumes the dependency has a lifetime 
             of <see cref="F:Chopsticks.Dependencies.DependencyLifetime.Contained"/>.
             </remarks>
-        </member>
-        <member name="P:Chopsticks.Dependencies.Resolutions.ContainedResolution.IsContained">
-            <inheritdoc/>
         </member>
         <member name="M:Chopsticks.Dependencies.Resolutions.ContainedResolution.Dispose">
             <inheritdoc/>
@@ -345,12 +387,6 @@
             <param name="contract">The contract that this resolution fulfills.</param>
             <param name="factory">The factory that provides implementations for resolution.</param>
         </member>
-        <member name="P:Chopsticks.Dependencies.Resolutions.DependencyResolution.IsContained">
-            <summary>
-            Specifies whether this resolution should be contained within its container, 
-            which should require it to be copied to any inheriting containers.
-            </summary>
-        </member>
         <member name="P:Chopsticks.Dependencies.Resolutions.DependencyResolution.Registration">
             <summary>
             The registration that identifies this resolution as a dependency of a 
@@ -364,15 +400,16 @@
         </member>
         <member name="M:Chopsticks.Dependencies.Resolutions.DependencyResolution.Dispose">
             <summary>
-            Performs disposal of all instances managed by this resolution.
+            Performs disposal of all instances managed, either directly 
+            or indirectly through a factory, by this resolution.
             </summary>
         </member>
         <member name="M:Chopsticks.Dependencies.Resolutions.DependencyResolution.DisposeFor(Chopsticks.Dependencies.Containers.IDependencyContainer)">
             <summary>
             Performs disposal of any instances that are exclusive to the specified container 
-            and that are managed by this resolution.
+            and that are directly managed by this resolution.
             </summary>
-            <param name="container">The container whose exclusive instances managed by 
+            <param name="container">The container whose exclusive instances are directly managed by 
             this resolution will be disposed.</param>
         </member>
         <member name="M:Chopsticks.Dependencies.Resolutions.DependencyResolution.Get(Chopsticks.Dependencies.Containers.IDependencyContainer)">
@@ -381,7 +418,8 @@
             </summary>
             <param name="container">The container that will provide any constructed 
             implementation's own dependencies.</param>
-            <returns>An implementation that resolves the dependency.</returns>
+            <returns>An implementation that resolves the dependency, or null 
+            if this resolution has been disposed of.</returns>
         </member>
         <member name="T:Chopsticks.Dependencies.Resolutions.DependencyResolutionFactory">
             <inheritdoc cref="T:Chopsticks.Dependencies.Resolutions.IDependencyResolutionFactory"/>
@@ -427,6 +465,16 @@
             </summary>
             <param name="contract">The type of the contract.</param>
             <returns>All resolving resolutions. If there are none, 
+            the returned collection will be empty.</returns>
+        </member>
+        <member name="M:Chopsticks.Dependencies.Resolutions.IDependencyResolutionProvider.GetResolutionsForDisposal">
+            <summary>
+            Provides all disposable resolutions known to this provider.
+            </summary>
+            <remarks>
+            This includes all resolutions of a parent provider.
+            </remarks>
+            <returns>All disposable resolutions. If there are none, 
             the returned collection will be empty.</returns>
         </member>
         <member name="T:Chopsticks.Dependencies.Resolutions.SingletonResolution">

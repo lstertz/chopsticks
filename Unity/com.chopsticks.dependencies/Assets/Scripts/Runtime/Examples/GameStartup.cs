@@ -15,7 +15,6 @@ namespace Examples
             _container.Register(new()
             {
                 Contract = typeof(IContractA),
-                Implementation = typeof(DependencyA),
                 ImplementationFactory = _ =>
                 {
                     // This is not the proper workflow once MonoDependencies register themselves.
