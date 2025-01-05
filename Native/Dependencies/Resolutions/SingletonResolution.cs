@@ -9,7 +9,7 @@ namespace Chopsticks.Dependencies.Resolutions
     /// of <see cref="DependencyLifetime.Singleton"/>.
     /// </remarks>
     public class SingletonResolution(Type contract,
-        Func<IDependencyContainer, object> factory) :
+        Func<IDependencyContainer, object?> factory) :
         DependencyResolution(contract, factory)
     {
         private object? _instance;

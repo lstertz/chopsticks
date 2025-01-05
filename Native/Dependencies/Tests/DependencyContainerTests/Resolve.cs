@@ -1,7 +1,6 @@
 ﻿using Chopsticks.Dependencies.Containers;
 using Chopsticks.Dependencies.Resolutions;
 using NSubstitute;
-using System.ComponentModel;
 
 namespace DependencyContainerTests;
 

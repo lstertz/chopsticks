@@ -10,7 +10,7 @@ namespace Chopsticks.Dependencies.Resolutions
     /// of <see cref="DependencyLifetime.Contained"/>.
     /// </remarks>
     public class ContainedResolution(Type contract,
-        Func<IDependencyContainer, object> factory) :
+        Func<IDependencyContainer, object?> factory) :
         DependencyResolution(contract, factory)
     {
         private readonly Dictionary<IDependencyContainer, object> _instances = new(1);
