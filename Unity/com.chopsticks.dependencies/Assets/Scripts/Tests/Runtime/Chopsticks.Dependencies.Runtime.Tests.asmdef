@@ -1,11 +1,23 @@
 {
-	"name": "Chopsticks.Dependencies.Runtime.Tests",
-	"references": [
-		"Chopsticks.Dependencies"
-	],
-	"optionalUnityReferences":[
-		"TestAssemblies"
-	],
-	"includePlatforms": [],
-	"excludePlatforms": []
+    "name": "Chopsticks.Dependencies.Runtime.Tests",
+    "rootNamespace": "",
+    "references": [
+        "Chopsticks.Dependencies",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll",
+        "Dependencies.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

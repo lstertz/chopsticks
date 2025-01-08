@@ -5,84 +5,104 @@ using UnityEngine;
 
 namespace Chopsticks.Dependencies.Containers
 {
+
     /// <summary>
     /// Designates that all child GameObject Containers/Dependencies 
     /// are contained within this container. This enables the organization 
     /// of dependencies to be defined through the Unity hierarchy and prefabs.
     /// </summary>
-    public class MonoContainer : MonoBehaviour, IDependencyContainer
+    public class MonoContainer : BaseMonoContainer
     {
-        public bool InheritParentDependencies
+        public override bool InheritParentDependencies
         {
-            get => _container.InheritParentDependencies;
-            set => _container.InheritParentDependencies = value;
+            get => InnerContainer.InheritParentDependencies;
+            set => InnerContainer.InheritParentDependencies = value;
         }
-        [SerializeField]  // TODO :: Prevent editing during runtime.
+        [SerializeField]
         private bool _inheritParentDependencies;
 
-        public IDependencyResolutionProvider Parent
+        public override IDependencyResolutionProvider Parent
         {
-            get => _container.Parent;
-            set => _container.Parent = value;
+            get => InnerContainer.Parent;
+            set => InnerContainer.Parent = value;
         }
-
-        // TODO ?? Permit an override parent, to work detached from the hierarchy.
-
-        private DependencyContainer _container;
+        [SerializeField]
+        private BaseMonoContainer _overrideParent;
 
 
-        private void Awake()
+        protected IDependencyContainer InnerContainer { get; private set; }
+        protected IDependencyResolutionProvider InnerProvider { get; private set; }
+
+
+        public void Awake()
         {
-            _container = new()
+            // TODO :: Abstract creation or delegate only to implementations, with 
+            //          properties defined in the BaseMonoContainer.
+
+            var innerContainer = new DependencyContainer()
             {
                 InheritParentDependencies = _inheritParentDependencies,
-                Parent = null  // TODO :: Build with parent from up the hierarchy, or global.
+                Parent = FindParent()
             };
-        }
 
-        protected void Register()
-        {
-            // Use the container to register for a non-MonoBehaviour
-            //   dependency.
+            InnerContainer = innerContainer;
+            InnerProvider = innerContainer;
         }
 
         protected virtual void SetUp() { }
 
-        private void OnDestroy()
+
+        public void OnDestroy()
         {
             // Dispose of the container.
         }
 
-        private void OnTransformParentChanged()
+
+        public void OnTransformParentChanged() => 
+            InnerContainer.Parent = FindParent();
+
+        private BaseMonoContainer FindParent()
         {
-            _container.Parent = null;  // TODO :: Climb the tree to find the new parent.
+            var parent = _overrideParent ?? GetComponentInParent<BaseMonoContainer>();
+            if (parent == null)
+            {
+                // TODO :: Default to global container.
+            }
+
+            return parent;
         }
 
 
-        public IDependencyContainer Deregister(DependencyRegistration registration)
+        public void OnValidate()
         {
-            throw new NotImplementedException();
+            // TODO :: Update for inherit parent dependencies or override parent changing.
         }
 
-        public IDependencyContainer Register(DependencySpecification specification, 
-            out DependencyRegistration registration)
-        {
-            throw new NotImplementedException();
-        }
 
-        public bool Resolve(Type dependencyType, out object implementation)
-        {
-            throw new NotImplementedException();
-        }
+        public override IDependencyContainer Deregister(DependencyRegistration registration) => 
+            InnerContainer.Deregister(registration);
 
-        public IEnumerable<object> ResolveAll(Type dependencyType)
-        {
-            throw new NotImplementedException();
-        }
+        public override IDependencyContainer Register(DependencySpecification specification, 
+            out DependencyRegistration registration) => 
+            InnerContainer.Register(specification, out registration);
 
-        public void ResolveAllSingletons()
-        {
-            throw new NotImplementedException();
-        }
+        public override bool Resolve(Type dependencyType, out object implementation) => 
+            InnerContainer.Resolve(dependencyType, out implementation);
+
+        public override IEnumerable<object> ResolveAll(Type dependencyType) => 
+            InnerContainer.ResolveAll(dependencyType);
+
+
+        public override bool CanProvide(Type contract) => 
+            InnerProvider.CanProvide(contract);
+
+        public override DependencyResolution GetResolution(Type contract) => 
+            InnerProvider.GetResolution(contract);
+
+        public override IEnumerable<DependencyResolution> GetResolutions(Type contract) => 
+            InnerProvider.GetResolutions(contract);
+
+        public override IEnumerable<DependencyResolution> GetResolutionsForDisposal() => 
+            InnerProvider.GetResolutionsForDisposal();
     }
 }
