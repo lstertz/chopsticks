@@ -5,7 +5,8 @@ namespace MonoContainerTests
 {
     public static class MonoContainerTestExtensions
     {
-        public static MonoContainer SetSerializedProperty(this MonoContainer container, 
+        public static MockMonoContainer SetSerializedProperty(
+            this MockMonoContainer container, 
             string propertyName, bool value)
         {
             var serializedObject = new SerializedObject(container);
@@ -17,7 +18,8 @@ namespace MonoContainerTests
             return container;
         }
 
-        public static MonoContainer SetSerializedProperty(this MonoContainer container,
+        public static MockMonoContainer SetSerializedProperty(
+            this MockMonoContainer container,
             string propertyName, UnityEngine.Object value)
         {
             var serializedObject = new SerializedObject(container);

@@ -5,51 +5,53 @@ using UnityEngine;
 
 namespace Chopsticks.Dependencies.Containers
 {
-
     /// <summary>
     /// Designates that all child GameObject Containers/Dependencies 
     /// are contained within this container. This enables the organization 
     /// of dependencies to be defined through the Unity hierarchy and prefabs.
     /// </summary>
-    public class MonoContainer : BaseMonoContainer
+    /// <typeparam name="TNativeContainer">The type of the native container that manages 
+    /// the dependencies of this mono container.</typeparam>
+    public abstract class MonoContainer<TNativeContainer> : MonoBehaviour, IDependencyContainer
+        where TNativeContainer: IDependencyContainer, IDependencyResolutionProvider
     {
-        public override bool InheritParentDependencies
-        {
-            get => InnerContainer.InheritParentDependencies;
-            set => InnerContainer.InheritParentDependencies = value;
-        }
+        protected TNativeContainer InternalContainer { get; private set; }
+
+
         [SerializeField]
         private bool _inheritParentDependencies;
 
-        public override IDependencyResolutionProvider Parent
-        {
-            get => InnerContainer.Parent;
-            set => InnerContainer.Parent = value;
-        }
         [SerializeField]
-        private BaseMonoContainer _overrideParent;
+        private MonoContainer<TNativeContainer> _overrideParent;
 
 
-        protected IDependencyContainer InnerContainer { get; private set; }
-        protected IDependencyResolutionProvider InnerProvider { get; private set; }
-
-
+        /// <summary>
+        /// Initiates <see cref="SetUp"/>, defines parent settings, and calls 
+        /// <see cref="RegisterNativeDependencies"/>.
+        /// </summary>
         public void Awake()
         {
-            // TODO :: Abstract creation or delegate only to implementations, with 
-            //          properties defined in the BaseMonoContainer.
+            InternalContainer = SetUp();
+            InternalContainer.Parent = FindParent();
+            InternalContainer.InheritParentDependencies = _inheritParentDependencies;
 
-            var innerContainer = new DependencyContainer()
-            {
-                InheritParentDependencies = _inheritParentDependencies,
-                Parent = FindParent()
-            };
-
-            InnerContainer = innerContainer;
-            InnerProvider = innerContainer;
+            RegisterNativeDependencies();
         }
 
-        protected virtual void SetUp() { }
+        /// <summary>
+        /// Sets up the internal container of this mono container.
+        /// </summary>
+        /// <returns>The container that will internally manage the dependencies 
+        /// of this mono container.</returns>
+        protected abstract TNativeContainer SetUp();
+
+        /// <summary>
+        /// Registers any native dependencies that should be inherent to this container.
+        /// </summary>
+        /// <remarks>
+        /// This is only performed once after <see cref="SetUp"/>.
+        /// </remarks>
+        protected virtual void RegisterNativeDependencies() { }
 
 
         public void OnDestroy()
@@ -59,50 +61,39 @@ namespace Chopsticks.Dependencies.Containers
 
 
         public void OnTransformParentChanged() => 
-            InnerContainer.Parent = FindParent();
+            InternalContainer.Parent = FindParent();
 
-        private BaseMonoContainer FindParent()
+        private IDependencyResolutionProvider FindParent()
         {
-            var parent = _overrideParent ?? GetComponentInParent<BaseMonoContainer>();
+            var parent = _overrideParent != null ? _overrideParent : 
+                GetComponentInParent<MonoContainer<TNativeContainer>>();
             if (parent == null)
             {
                 // TODO :: Default to global container.
             }
 
-            return parent;
+            return parent.InternalContainer;
         }
 
 
         public void OnValidate()
         {
+            // TODO :: Prevent override parent from forming a chain.
             // TODO :: Update for inherit parent dependencies or override parent changing.
         }
 
 
-        public override IDependencyContainer Deregister(DependencyRegistration registration) => 
-            InnerContainer.Deregister(registration);
+        public IDependencyContainer Deregister(DependencyRegistration registration) => 
+            InternalContainer.Deregister(registration);
 
-        public override IDependencyContainer Register(DependencySpecification specification, 
+        public IDependencyContainer Register(DependencySpecification specification, 
             out DependencyRegistration registration) => 
-            InnerContainer.Register(specification, out registration);
+            InternalContainer.Register(specification, out registration);
 
-        public override bool Resolve(Type dependencyType, out object implementation) => 
-            InnerContainer.Resolve(dependencyType, out implementation);
+        public bool Resolve(Type dependencyType, out object implementation) => 
+            InternalContainer.Resolve(dependencyType, out implementation);
 
-        public override IEnumerable<object> ResolveAll(Type dependencyType) => 
-            InnerContainer.ResolveAll(dependencyType);
-
-
-        public override bool CanProvide(Type contract) => 
-            InnerProvider.CanProvide(contract);
-
-        public override DependencyResolution GetResolution(Type contract) => 
-            InnerProvider.GetResolution(contract);
-
-        public override IEnumerable<DependencyResolution> GetResolutions(Type contract) => 
-            InnerProvider.GetResolutions(contract);
-
-        public override IEnumerable<DependencyResolution> GetResolutionsForDisposal() => 
-            InnerProvider.GetResolutionsForDisposal();
+        public IEnumerable<object> ResolveAll(Type dependencyType) => 
+            InternalContainer.ResolveAll(dependencyType);
     }
 }

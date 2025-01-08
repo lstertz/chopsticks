@@ -1,5 +1,4 @@
-﻿using Chopsticks.Dependencies.Containers;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using UnityEngine;
 
 namespace MonoContainerTests
@@ -13,14 +12,14 @@ namespace MonoContainerTests
             var gameObject = new GameObject();
             gameObject.SetActive(false);
 
-            var container = gameObject.AddComponent<MonoContainer>();
+            var container = gameObject.AddComponent<MockMonoContainer>();
             container.SetSerializedProperty("_inheritParentDependencies", false);
 
             // Act
             gameObject.SetActive(true);
 
             // Assert
-            Assert.That(container.InheritParentDependencies, Is.False);
+            Assert.That(container.InternalContainer.InheritParentDependencies, Is.False);
         }
 
         [Test]
@@ -30,14 +29,14 @@ namespace MonoContainerTests
             var gameObject = new GameObject();
             gameObject.SetActive(false);
 
-            var container = gameObject.AddComponent<MonoContainer>();
+            var container = gameObject.AddComponent<MockMonoContainer>();
             container.SetSerializedProperty("_inheritParentDependencies", true);
 
             // Act
             gameObject.SetActive(true);
 
             // Assert
-            Assert.That(container.InheritParentDependencies, Is.True);
+            Assert.That(container.InternalContainer.InheritParentDependencies, Is.True);
         }
 
 

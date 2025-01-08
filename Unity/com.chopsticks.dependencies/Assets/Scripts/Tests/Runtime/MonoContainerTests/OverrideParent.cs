@@ -1,5 +1,4 @@
-﻿using Chopsticks.Dependencies.Containers;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using UnityEngine;
 
 namespace MonoContainerTests
@@ -13,15 +12,16 @@ namespace MonoContainerTests
             var gameObject = new GameObject();
             gameObject.SetActive(false);
 
-            var container = gameObject.AddComponent<MonoContainer>();
-            var parentContainer = new GameObject().AddComponent<MonoContainer>();
+            var container = gameObject.AddComponent<MockMonoContainer>();
+            var parentContainer = new GameObject().AddComponent<MockMonoContainer>();
             container.SetSerializedProperty("_overrideParent", parentContainer);
 
             // Act
             gameObject.SetActive(true);
 
             // Assert
-            Assert.That(parentContainer, Is.EqualTo(container.Parent));
+            Assert.That(container.InternalContainer.Parent, 
+                Is.EqualTo(parentContainer.InternalContainer));
         }
 
         // TODO :: Test for changes after creation.

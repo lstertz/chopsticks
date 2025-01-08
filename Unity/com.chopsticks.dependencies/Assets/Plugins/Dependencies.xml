@@ -100,20 +100,6 @@
             and accessibility.
             </summary>
         </member>
-        <member name="P:Chopsticks.Dependencies.Containers.IDependencyContainer.InheritParentDependencies">
-            <summary>
-            Specifies whether this container should inherit all of its parent container's 
-            registered dependencies.
-            </summary>
-        </member>
-        <member name="P:Chopsticks.Dependencies.Containers.IDependencyContainer.Parent">
-            <summary>
-            The parent container, as a resolution provider.
-            </summary>
-            <remarks>
-            This is null if this container has no parent container.
-            </remarks>
-        </member>
         <member name="M:Chopsticks.Dependencies.Containers.IDependencyContainer.Deregister(Chopsticks.Dependencies.Containers.DependencyRegistration)">
             <summary>
             Deregisters the dependency identified by the given registration.
@@ -443,6 +429,20 @@
             <summary>
             Provides resolutions for dependencies.
             </summary>
+        </member>
+        <member name="P:Chopsticks.Dependencies.Resolutions.IDependencyResolutionProvider.InheritParentDependencies">
+            <summary>
+            Specifies whether this provider should inherit all of its parent provider's 
+            registered dependencies.
+            </summary>
+        </member>
+        <member name="P:Chopsticks.Dependencies.Resolutions.IDependencyResolutionProvider.Parent">
+            <summary>
+            The parent of this provider.
+            </summary>
+            <remarks>
+            This is null if this provider has no parent.
+            </remarks>
         </member>
         <member name="M:Chopsticks.Dependencies.Resolutions.IDependencyResolutionProvider.CanProvide(System.Type)">
             <summary>
