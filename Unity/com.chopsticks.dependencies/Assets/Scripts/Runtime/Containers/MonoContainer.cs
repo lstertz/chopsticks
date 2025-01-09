@@ -83,16 +83,26 @@ namespace Chopsticks.Dependencies.Containers
         }
 
 
-        public IDependencyContainer Deregister(DependencyRegistration registration) => 
+        /// <inheritdoc/>
+        public IDependencyContainer Deregister(DependencyRegistration registration)
+        {
             InternalContainer.Deregister(registration);
+            return this;
+        }
 
-        public IDependencyContainer Register(DependencySpecification specification, 
-            out DependencyRegistration registration) => 
+        /// <inheritdoc/>
+        public IDependencyContainer Register(DependencySpecification specification,
+            out DependencyRegistration registration)
+        {
             InternalContainer.Register(specification, out registration);
+            return this;
+        }
 
+        /// <inheritdoc/>
         public bool Resolve(Type dependencyType, out object implementation) => 
             InternalContainer.Resolve(dependencyType, out implementation);
 
+        /// <inheritdoc/>
         public IEnumerable<object> ResolveAll(Type dependencyType) => 
             InternalContainer.ResolveAll(dependencyType);
     }
