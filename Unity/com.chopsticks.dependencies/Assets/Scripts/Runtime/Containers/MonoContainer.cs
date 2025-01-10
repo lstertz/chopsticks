@@ -13,7 +13,7 @@ namespace Chopsticks.Dependencies.Containers
     /// <typeparam name="TNativeContainer">The type of the native container that manages 
     /// the dependencies of this mono container.</typeparam>
     public abstract class MonoContainer<TNativeContainer> : MonoBehaviour, IDependencyContainer
-        where TNativeContainer: IDependencyContainer, IDependencyResolutionProvider
+        where TNativeContainer: IDependencyContainer, IDependencyResolutionProvider, IDisposable
     {
         protected TNativeContainer InternalContainer { get; private set; }
 
@@ -54,10 +54,8 @@ namespace Chopsticks.Dependencies.Containers
         protected virtual void RegisterNativeDependencies() { }
 
 
-        public void OnDestroy()
-        {
-            // Dispose of the container.
-        }
+        public void OnDestroy() => 
+            InternalContainer.Dispose();
 
 
         public void OnTransformParentChanged() => 

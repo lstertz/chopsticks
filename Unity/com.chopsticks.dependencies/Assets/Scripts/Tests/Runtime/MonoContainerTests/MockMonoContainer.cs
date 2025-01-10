@@ -10,13 +10,14 @@ namespace MonoContainerTests
     public class MockMonoContainer : MonoContainer<MockDependencyContainer>
     {
         public abstract class MockDependencyContainer :
-            IDependencyContainer, IDependencyResolutionProvider
+            IDependencyContainer, IDependencyResolutionProvider, IDisposable
         {
             public abstract bool InheritParentDependencies { get; set; }
             public abstract IDependencyResolutionProvider Parent { get; set; }
 
             public abstract bool CanProvide(Type contract);
             public abstract IDependencyContainer Deregister(DependencyRegistration registration);
+            public abstract void Dispose();
             public abstract DependencyResolution GetResolution(Type contract);
             public abstract IEnumerable<DependencyResolution> GetResolutions(Type contract);
             public abstract IEnumerable<DependencyResolution> GetResolutionsForDisposal();
