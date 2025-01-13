@@ -1,9 +1,8 @@
-﻿using Chopsticks.Dependencies.Containers;
-using UnityEditor;
+﻿using UnityEditor;
 
-namespace MonoContainerTests
+namespace MonoContainerTests.Mocks
 {
-    public static class MonoContainerTestExtensions
+    public static class MockMonoContainerTestExtensions
     {
         public static MockMonoContainer SetSerializedProperty(
             this MockMonoContainer container, 

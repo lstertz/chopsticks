@@ -12,9 +12,14 @@ namespace Chopsticks.Dependencies.Containers
     /// </summary>
     /// <typeparam name="TNativeContainer">The type of the native container that manages 
     /// the dependencies of this mono container.</typeparam>
-    public abstract class MonoContainer<TNativeContainer> : MonoBehaviour, IDependencyContainer
+    public abstract class MonoContainer<TNativeContainer, TGlobalContainerProvider> : 
+        MonoBehaviour, IDependencyContainer
+        where TGlobalContainerProvider : IGlobalContainerProvider<TNativeContainer>, new()
         where TNativeContainer: IDependencyContainer, IDependencyResolutionProvider, IDisposable
     {
+        public static IDependencyContainer Global => _globalContainerProvider.Get;
+        private static readonly TGlobalContainerProvider _globalContainerProvider = new();
+
         protected TNativeContainer InternalContainer { get; private set; }
 
 
@@ -22,7 +27,22 @@ namespace Chopsticks.Dependencies.Containers
         private bool _inheritParentDependencies;
 
         [SerializeField]
-        private MonoContainer<TNativeContainer> _overrideParent;
+        private MonoContainer<TNativeContainer, TGlobalContainerProvider> _overrideParent;
+
+        // TODO :: Option to be child of:
+        //          None
+        //          Global
+        //          Hierarchy (with global)
+        //          Hierarchy (without global)
+        //          Override
+
+
+        // TODO :: Inspector display features:
+        //          Current parent.
+        //          Contained MonoDependencies.
+        //          Maybe list native dependencies.
+        //          Prevent disablement.
+
 
 
         /// <summary>
@@ -63,12 +83,12 @@ namespace Chopsticks.Dependencies.Containers
 
         private IDependencyResolutionProvider FindParent()
         {
+            // TODO :: Clean-up and account for other options.
+
             var parent = _overrideParent != null ? _overrideParent : 
-                GetComponentInParent<MonoContainer<TNativeContainer>>();
+                GetComponentInParent<MonoContainer<TNativeContainer, TGlobalContainerProvider>>();
             if (parent == null)
-            {
-                // TODO :: Default to global container.
-            }
+                return _globalContainerProvider.Get;
 
             return parent.InternalContainer;
         }

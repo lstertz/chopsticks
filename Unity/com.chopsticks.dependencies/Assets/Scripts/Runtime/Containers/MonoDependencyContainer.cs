@@ -5,7 +5,8 @@
     /// are contained within this container. This enables the organization 
     /// of dependencies to be defined through the Unity hierarchy and prefabs.
     /// </summary>
-    public class MonoDependencyContainer : MonoContainer<DependencyContainer>
+    public class MonoDependencyContainer : 
+        MonoContainer<DependencyContainer, GlobalDependencyContainerProvider>
     {
         protected override DependencyContainer SetUp() => new();
     }
