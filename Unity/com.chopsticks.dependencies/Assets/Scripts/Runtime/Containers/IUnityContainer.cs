@@ -3,11 +3,9 @@ using System;
 
 namespace Chopsticks.Dependencies.Containers
 {
-    public interface IGlobalContainerProvider<TNativeContainer>
+    public interface IUnityContainer<TNativeContainer>
         where TNativeContainer : IDependencyContainer, IDependencyResolutionProvider, IDisposable
     {
-        TNativeContainer Get { get; }
-
-        void Reset();
+        TNativeContainer NativeContainer { get; }
     }
 }

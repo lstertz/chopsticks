@@ -4,10 +4,8 @@ using NSubstitute;
 namespace MonoContainerTests.Mocks
 {
     public class MockMonoContainer : 
-        MonoContainer<MockDependencyContainer, MockGlobalContainerProvider>
+        BaseMonoContainer<MockDependencyContainer, MockMonoContainerService>
     {
-
-
         public new MockDependencyContainer InternalContainer { get; set; } = 
             Substitute.For<MockDependencyContainer>();
 

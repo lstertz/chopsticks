@@ -16,6 +16,18 @@ namespace MonoContainerTests.Mocks
 
             return container;
         }
+        public static MockMonoContainer SetSerializedProperty(
+            this MockMonoContainer container,
+            string propertyName, Chopsticks.Dependencies.Containers.ContainerParentSetting value)
+        {
+            var serializedObject = new SerializedObject(container);
+            var serializedProperty = serializedObject.FindProperty(propertyName);
+
+            serializedProperty.enumValueFlag = (int)value;
+            serializedObject.ApplyModifiedProperties();
+
+            return container;
+        }
 
         public static MockMonoContainer SetSerializedProperty(
             this MockMonoContainer container,
