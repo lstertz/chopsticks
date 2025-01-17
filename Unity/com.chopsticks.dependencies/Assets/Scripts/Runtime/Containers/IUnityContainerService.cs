@@ -9,9 +9,11 @@ namespace Chopsticks.Dependencies.Containers
     {
         TNativeContainer GlobalContainer { get; }
 
-        TNativeContainer GetContainer<TUnityContainer>(ContainerRetrievalSetting setting, 
-            bool includeSelf, TUnityContainer unityContainer, TUnityContainer overrideContainer)
-            where TUnityContainer : MonoBehaviour, IUnityContainer<TNativeContainer>;
+        TNativeContainer GetContainer<TUnityContainer, TOverrideContainer>(
+            ContainerRetrievalSetting setting, bool includeSelf, 
+            TUnityContainer unityContainer, TOverrideContainer overrideContainer)
+            where TUnityContainer : MonoBehaviour, IUnityContainer<TNativeContainer>
+            where TOverrideContainer : IUnityContainer<TNativeContainer>;
 
         void ResetGlobal();
     }

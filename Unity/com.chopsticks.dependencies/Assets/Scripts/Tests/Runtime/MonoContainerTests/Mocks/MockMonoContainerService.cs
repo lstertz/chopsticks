@@ -12,10 +12,11 @@ namespace MonoContainerTests.Mocks
         public MockDependencyContainer GlobalContainer { get; } = 
             Substitute.For<MockDependencyContainer>();
 
-        public MockDependencyContainer GetContainer<TUnityContainer>(
-            ContainerRetrievalSetting setting, bool includeSelf, TUnityContainer unityContainer, 
-            TUnityContainer overrideContainer)
-            where TUnityContainer : MonoBehaviour, IUnityContainer<MockDependencyContainer> => 
+        public MockDependencyContainer GetContainer<TUnityContainer, TOverrideContainer>(
+            ContainerRetrievalSetting setting, bool includeSelf, TUnityContainer unityContainer,
+            TOverrideContainer overrideContainer)
+            where TUnityContainer : MonoBehaviour, IUnityContainer<MockDependencyContainer>
+            where TOverrideContainer : IUnityContainer<MockDependencyContainer> => 
             Sub.GetContainer(setting, includeSelf, unityContainer, overrideContainer);
 
         public void ResetGlobal() => 

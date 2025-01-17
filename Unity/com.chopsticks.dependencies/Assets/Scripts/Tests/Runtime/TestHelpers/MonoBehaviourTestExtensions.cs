@@ -1,11 +1,12 @@
 ﻿using UnityEditor;
+using UnityEngine;
 
-namespace MonoContainerTests.Mocks
+namespace TestHelpers
 {
-    public static class MockMonoContainerTestExtensions
+    public static class MonoBehaviourTestExtensions
     {
-        public static MockMonoContainer SetSerializedProperty(
-            this MockMonoContainer container, 
+        public static MonoBehaviour SetSerializedProperty(
+            this MonoBehaviour container, 
             string propertyName, bool value)
         {
             var serializedObject = new SerializedObject(container);
@@ -16,8 +17,8 @@ namespace MonoContainerTests.Mocks
 
             return container;
         }
-        public static MockMonoContainer SetSerializedProperty(
-            this MockMonoContainer container,
+        public static MonoBehaviour SetSerializedProperty(
+            this MonoBehaviour container,
             string propertyName, Chopsticks.Dependencies.Containers.ContainerParentSetting value)
         {
             var serializedObject = new SerializedObject(container);
@@ -29,9 +30,9 @@ namespace MonoContainerTests.Mocks
             return container;
         }
 
-        public static MockMonoContainer SetSerializedProperty(
-            this MockMonoContainer container,
-            string propertyName, UnityEngine.Object value)
+        public static MonoBehaviour SetSerializedProperty(
+            this MonoBehaviour container,
+            string propertyName, Object value)
         {
             var serializedObject = new SerializedObject(container);
             var serializedProperty = serializedObject.FindProperty(propertyName);

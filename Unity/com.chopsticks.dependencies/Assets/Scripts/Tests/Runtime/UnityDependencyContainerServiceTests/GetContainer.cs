@@ -1,18 +1,18 @@
 ﻿using Chopsticks.Dependencies.Containers;
-using MonoContainerTests.Mocks;
+using TestHelpers;
 using NUnit.Framework;
 using UnityEngine;
 
-namespace MonoContainerServiceTests
+namespace UnityDependencyContainerServiceTests
 {
     public class GetContainer
     {
         public class SetUp
         {
-            public static MonoContainerService ParentedContainers(
+            public static UnityDependencyContainerService ParentedContainers(
                 out MonoContainer childContainer, out MonoContainer parentContainer)
             {
-                var service = new MonoContainerService();
+                var service = new UnityDependencyContainerService();
 
                 var parentGameObject = new GameObject("Parent Object");
                 var gameObject = new GameObject("Test Object");
@@ -20,14 +20,22 @@ namespace MonoContainerServiceTests
                 gameObject.SetActive(false);
 
                 childContainer = gameObject.AddComponent<MonoContainer>();
+
+                // Prevent the parent container from being set during this set up.
+                childContainer.SetSerializedProperty("_containerParentSetting",
+                    ContainerParentSetting.None);
+
                 parentContainer = parentGameObject.AddComponent<MonoContainer>();
+
+                gameObject.SetActive(true);
 
                 return service;
             }
 
-            public static MonoContainerService StandardContainer(out MonoContainer container)
+            public static UnityDependencyContainerService StandardContainer(
+                out MonoContainer container)
             {
-                var service = new MonoContainerService();
+                var service = new UnityDependencyContainerService();
 
                 var gameObject = new GameObject("Test Object");
                 gameObject.SetActive(false);
@@ -43,11 +51,12 @@ namespace MonoContainerServiceTests
         public void GetContainer_GlobalRetrievalSetting_Global()
         {
             // Set up
-            var service = new MonoContainerService();
+            var service = new UnityDependencyContainerService();
 
             // Act
-            var serviceContainer = service.GetContainer(ContainerRetrievalSetting.Global,
-                false, (MonoContainer)null, null);
+            var serviceContainer = service.GetContainer(
+                ContainerRetrievalSetting.Global,
+                false, (MonoContainer)null, (MonoContainer)null);
 
             // Assert
             Assert.That(serviceContainer, Is.EqualTo(service.GlobalContainer));
@@ -61,26 +70,12 @@ namespace MonoContainerServiceTests
 
             // Act
             var serviceContainer = service.GetContainer(
-                ContainerRetrievalSetting.HierarchyWithGlobal, true, child, null);
+                ContainerRetrievalSetting.HierarchyWithGlobal, 
+                true, child, (MonoContainer)null);
 
             // Assert
             Assert.That(serviceContainer, Is.EqualTo(
                 (child as IUnityContainer<DependencyContainer>).NativeContainer));
-        }
-
-        [Test]
-        public void GetContainer_HierarchyWithGlobalRetrievalSetting_WithParent_Parent()
-        {
-            // Set up
-            var service = SetUp.ParentedContainers(out var child, out var parent);
-
-            // Act
-            var serviceContainer = service.GetContainer(
-                ContainerRetrievalSetting.HierarchyWithGlobal, false, child, null);
-
-            // Assert
-            Assert.That(serviceContainer, Is.EqualTo(
-                (parent as IUnityContainer<DependencyContainer>).NativeContainer));
         }
 
         [Test]
@@ -91,10 +86,27 @@ namespace MonoContainerServiceTests
 
             // Act
             var serviceContainer = service.GetContainer(
-                ContainerRetrievalSetting.HierarchyWithGlobal, false, container, null);
+                ContainerRetrievalSetting.HierarchyWithGlobal, 
+                false, container, (MonoContainer)null);
 
             // Assert
             Assert.That(serviceContainer, Is.EqualTo(MonoContainer.Global));
+        }
+
+        [Test]
+        public void GetContainer_HierarchyWithGlobalRetrievalSetting_WithParent_Parent()
+        {
+            // Set up
+            var service = SetUp.ParentedContainers(out var child, out var parent);
+
+            // Act
+            var serviceContainer = service.GetContainer(
+                ContainerRetrievalSetting.HierarchyWithGlobal, 
+                false, child, (MonoContainer)null);
+
+            // Assert
+            Assert.That(serviceContainer, Is.EqualTo(
+                (parent as IUnityContainer<DependencyContainer>).NativeContainer));
         }
 
         [Test]
@@ -105,26 +117,12 @@ namespace MonoContainerServiceTests
 
             // Act
             var serviceContainer = service.GetContainer(
-                ContainerRetrievalSetting.HierarchyWithoutGlobal, true, child, null);
+                ContainerRetrievalSetting.HierarchyWithoutGlobal, 
+                true, child, (MonoContainer)null);
 
             // Assert
             Assert.That(serviceContainer, Is.EqualTo(
                 (child as IUnityContainer<DependencyContainer>).NativeContainer));
-        }
-
-        [Test]
-        public void GetContainer_HierarchyWithoutGlobalRetrievalSetting_WithParent_Parent()
-        {
-            // Set up
-            var service = SetUp.ParentedContainers(out var child, out var parent);
-
-            // Act
-            var serviceContainer = service.GetContainer(
-                ContainerRetrievalSetting.HierarchyWithoutGlobal, false, child, null);
-
-            // Assert
-            Assert.That(serviceContainer, Is.EqualTo(
-                (parent as IUnityContainer<DependencyContainer>).NativeContainer));
         }
 
         [Test]
@@ -135,10 +133,27 @@ namespace MonoContainerServiceTests
 
             // Act
             var serviceContainer = service.GetContainer(
-                ContainerRetrievalSetting.HierarchyWithoutGlobal, false, container, null);
+                ContainerRetrievalSetting.HierarchyWithoutGlobal, 
+                false, container, (MonoContainer)null);
 
             // Assert
             Assert.That(serviceContainer, Is.Null);
+        }
+
+        [Test]
+        public void GetContainer_HierarchyWithoutGlobalRetrievalSetting_WithParent_Parent()
+        {
+            // Set up
+            var service = SetUp.ParentedContainers(out var child, out var parent);
+
+            // Act
+            var serviceContainer = service.GetContainer(
+                ContainerRetrievalSetting.HierarchyWithoutGlobal, 
+                false, child, (MonoContainer)null);
+
+            // Assert
+            Assert.That(serviceContainer, Is.EqualTo(
+                (parent as IUnityContainer<DependencyContainer>).NativeContainer));
         }
 
         [Test]
@@ -148,8 +163,9 @@ namespace MonoContainerServiceTests
             var service = SetUp.StandardContainer(out var overrideContainer);
 
             // Act
-            var serviceContainer = service.GetContainer(ContainerRetrievalSetting.Override,
-                false, null, overrideContainer);
+            var serviceContainer = service.GetContainer(
+                ContainerRetrievalSetting.Override,
+                false, (MonoContainer)null, overrideContainer);
 
             // Assert
             Assert.That(serviceContainer, Is.EqualTo(

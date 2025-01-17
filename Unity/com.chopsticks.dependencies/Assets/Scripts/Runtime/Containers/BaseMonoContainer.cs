@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace Chopsticks.Dependencies.Containers
 {
-
     /// <summary>
     /// Designates that all child GameObject Containers/Dependencies 
     /// are contained within this container. This enables the organization 
@@ -52,9 +51,10 @@ namespace Chopsticks.Dependencies.Containers
         public void Awake()
         {
             InternalContainer = SetUp();
-            InternalContainer.Parent = _containerService.GetContainer(
-                (ContainerRetrievalSetting)_containerParentSetting, false, this, _overrideParent);
             InternalContainer.InheritParentDependencies = _inheritParentDependencies;
+            UpdateParent();
+
+            // TODO :: Check whether children need to update their parent.
 
             RegisterNativeDependencies();
         }
@@ -79,9 +79,9 @@ namespace Chopsticks.Dependencies.Containers
             InternalContainer.Dispose();
 
 
-        public void OnTransformParentChanged() =>
-            InternalContainer.Parent = _containerService.GetContainer(
-                (ContainerRetrievalSetting)_containerParentSetting, false, this, _overrideParent);
+        public void OnTransformParentChanged() => 
+            UpdateParent();
+            
 
         public void OnValidate()
         {
@@ -112,5 +112,18 @@ namespace Chopsticks.Dependencies.Containers
         /// <inheritdoc/>
         public IEnumerable<object> ResolveAll(Type dependencyType) =>
             InternalContainer.ResolveAll(dependencyType);
+
+
+        private void UpdateParent()
+        {
+            if (_containerParentSetting == ContainerParentSetting.None)
+            {
+                InternalContainer.Parent = null;
+                return;
+            }
+
+            InternalContainer.Parent = _containerService.GetContainer(
+                (ContainerRetrievalSetting)_containerParentSetting, false, this, _overrideParent);
+        }
     }
 }
