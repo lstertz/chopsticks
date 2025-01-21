@@ -9,6 +9,8 @@ namespace Chopsticks.Dependencies.Containers
     /// </summary>
     public class UnityDependencyContainerService : IUnityContainerService<DependencyContainer>
     {
+        // TODO :: Refactor as generic over TNativeContainer to enable better testing 
+        //          and more flexibility.
         // TODO :: Add locking for thread safety.
 
         /// <summary>
