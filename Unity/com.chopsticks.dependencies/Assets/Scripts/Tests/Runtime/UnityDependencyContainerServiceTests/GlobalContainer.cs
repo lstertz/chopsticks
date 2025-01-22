@@ -1,4 +1,5 @@
 ﻿using Chopsticks.Dependencies.Containers;
+using Chopsticks.Dependencies.Factories;
 using NUnit.Framework;
 
 namespace UnityDependencyContainerServiceTests
@@ -9,7 +10,8 @@ namespace UnityDependencyContainerServiceTests
         public void GlobalContainer_AfterReset_NewCallInstance()
         {
             // Set up
-            var service = new UnityDependencyContainerService();
+            var service = new UnityContainerService<DependencyContainer, 
+                DependencyContainerFactory>();
             var firstCallContainer = service.GlobalContainer;
             service.ResetGlobal();
 
@@ -25,7 +27,8 @@ namespace UnityDependencyContainerServiceTests
         public void GlobalContainer_FirstCall_IsNotNull()
         {
             // Set up
-            var service = new UnityDependencyContainerService();
+            var service = new UnityContainerService<DependencyContainer,
+                DependencyContainerFactory>();
 
             // Act
             var container = service.GlobalContainer;
@@ -38,7 +41,8 @@ namespace UnityDependencyContainerServiceTests
         public void GlobalContainer_SecondCall_MatchesFirstCallInstance()
         {
             // Set up
-            var service = new UnityDependencyContainerService();
+            var service = new UnityContainerService<DependencyContainer,
+                DependencyContainerFactory>();
             var firstCallContainer = service.GlobalContainer;
 
             // Act

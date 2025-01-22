@@ -23,7 +23,7 @@
             Constructs a new dependnecy container with the default resolution factory.
             </summary>
         </member>
-        <member name="M:Chopsticks.Dependencies.Containers.DependencyContainer.#ctor(Chopsticks.Dependencies.Resolutions.IDependencyResolutionFactory)">
+        <member name="M:Chopsticks.Dependencies.Containers.DependencyContainer.#ctor(Chopsticks.Dependencies.Factories.IDependencyResolutionFactory)">
             <summary>
             Constructs a new dependency container with the given resolution factory.
             </summary>
@@ -334,6 +334,40 @@
             </summary>
             <param name="message">The message that describes the error.</param>
         </member>
+        <member name="T:Chopsticks.Dependencies.Factories.DependencyContainerFactory">
+            <inheritdoc/>
+        </member>
+        <member name="M:Chopsticks.Dependencies.Factories.DependencyContainerFactory.BuildContainer">
+            <inheritdoc/>
+        </member>
+        <member name="T:Chopsticks.Dependencies.Factories.DependencyResolutionFactory">
+            <inheritdoc cref="T:Chopsticks.Dependencies.Factories.IDependencyResolutionFactory"/>
+        </member>
+        <member name="M:Chopsticks.Dependencies.Factories.DependencyResolutionFactory.BuildResolutionFor(Chopsticks.Dependencies.Containers.DependencySpecification)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Chopsticks.Dependencies.Factories.IDependencyContainerFactory`1">
+            <summary>
+            Manages the construction of dependency containers.
+            </summary>
+        </member>
+        <member name="M:Chopsticks.Dependencies.Factories.IDependencyContainerFactory`1.BuildContainer">
+            <summary>
+            Builds a new container.
+            </summary>
+        </member>
+        <member name="T:Chopsticks.Dependencies.Factories.IDependencyResolutionFactory">
+            <summary>
+            Manages the construction of dependency resolutions.
+            </summary>
+        </member>
+        <member name="M:Chopsticks.Dependencies.Factories.IDependencyResolutionFactory.BuildResolutionFor(Chopsticks.Dependencies.Containers.DependencySpecification)">
+            <summary>
+            Builds a resolution appropriate for the given specification.
+            </summary>
+            <param name="specification">The specification that will define the resolution.</param>
+            <returns>The new resolution.</returns>
+        </member>
         <member name="T:Chopsticks.Dependencies.Resolutions.ContainedResolution">
             <inheritdoc/>
             <remarks>
@@ -406,24 +440,6 @@
             implementation's own dependencies.</param>
             <returns>An implementation that resolves the dependency, or null 
             if this resolution has been disposed of.</returns>
-        </member>
-        <member name="T:Chopsticks.Dependencies.Resolutions.DependencyResolutionFactory">
-            <inheritdoc cref="T:Chopsticks.Dependencies.Resolutions.IDependencyResolutionFactory"/>
-        </member>
-        <member name="M:Chopsticks.Dependencies.Resolutions.DependencyResolutionFactory.BuildResolutionFor(Chopsticks.Dependencies.Containers.DependencySpecification)">
-            <inheritdoc/>
-        </member>
-        <member name="T:Chopsticks.Dependencies.Resolutions.IDependencyResolutionFactory">
-            <summary>
-            Manages the construction of dependency resolutions.
-            </summary>
-        </member>
-        <member name="M:Chopsticks.Dependencies.Resolutions.IDependencyResolutionFactory.BuildResolutionFor(Chopsticks.Dependencies.Containers.DependencySpecification)">
-            <summary>
-            Builds a resolution appropriate for the given specification.
-            </summary>
-            <param name="specification">The specification that will define the resolution.</param>
-            <returns>The new resolution.</returns>
         </member>
         <member name="T:Chopsticks.Dependencies.Resolutions.IDependencyResolutionProvider">
             <summary>

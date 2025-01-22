@@ -3,16 +3,20 @@ using TestHelpers;
 using NUnit.Framework;
 using UnityEngine;
 
+using UnityContainerService = Chopsticks.Dependencies.Containers.UnityContainerService<
+    Chopsticks.Dependencies.Containers.DependencyContainer, 
+    Chopsticks.Dependencies.Factories.DependencyContainerFactory>;
+
 namespace UnityDependencyContainerServiceTests
 {
     public class GetContainer
     {
         public class SetUp
         {
-            public static UnityDependencyContainerService ParentedContainers(
+            public static UnityContainerService ParentedContainers(
                 out MonoContainer childContainer, out MonoContainer parentContainer)
             {
-                var service = new UnityDependencyContainerService();
+                var service = new UnityContainerService();
 
                 var parentGameObject = new GameObject("Parent Object");
                 var gameObject = new GameObject("Test Object");
@@ -32,10 +36,10 @@ namespace UnityDependencyContainerServiceTests
                 return service;
             }
 
-            public static UnityDependencyContainerService StandardContainer(
+            public static UnityContainerService StandardContainer(
                 out MonoContainer container)
             {
-                var service = new UnityDependencyContainerService();
+                var service = new UnityContainerService();
 
                 var gameObject = new GameObject("Test Object");
                 gameObject.SetActive(false);
@@ -51,7 +55,7 @@ namespace UnityDependencyContainerServiceTests
         public void GetContainer_GlobalRetrievalSetting_Global()
         {
             // Set up
-            var service = new UnityDependencyContainerService();
+            var service = new UnityContainerService();
 
             // Act
             var serviceContainer = service.GetContainer(
