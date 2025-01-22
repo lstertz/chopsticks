@@ -3,7 +3,8 @@
 namespace Chopsticks.Dependencies.Factories
 {
     /// <inheritdoc/>
-    public class DependencyContainerFactory : IDependencyContainerFactory<DependencyContainer>
+    public class DefaultDependencyContainerFactory : 
+        IDependencyContainerFactory<DependencyContainer>
     {
         /// <inheritdoc/>
         public DependencyContainer BuildContainer() => new();

@@ -1,7 +1,7 @@
 using Chopsticks.Dependencies.Containers;
 using Chopsticks.Dependencies.Factories;
 
-namespace DependencyResolutionFactoryTests;
+namespace DefaultDependencyContainerFactoryTests;
 
 public class BuildResolutionFor
 {
@@ -15,7 +15,7 @@ public class BuildResolutionFor
     public void BuildContainer_FirstCall_BuildsNewInstance()
     {
         // Set up
-        var factory = new DependencyContainerFactory();
+        var factory = new DefaultDependencyContainerFactory();
 
         // Act
         var container = factory.BuildContainer();
@@ -29,7 +29,7 @@ public class BuildResolutionFor
     public void BuildContainer_SecondCall_BuildsNewInstance()
     {
         // Set up
-        var factory = new DependencyContainerFactory();
+        var factory = new DefaultDependencyContainerFactory();
         var firstContainer = factory.BuildContainer();
 
         // Act
