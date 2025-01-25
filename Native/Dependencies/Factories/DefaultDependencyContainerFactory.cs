@@ -2,11 +2,19 @@
 
 namespace Chopsticks.Dependencies.Factories
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Provides a default strategy to manage the construction of dependency containers.
+    /// </summary>
     public class DefaultDependencyContainerFactory : 
-        IDependencyContainerFactory<DependencyContainer>
+        IDependencyContainerFactory<DependencyContainer, DependencyContainerDefinition>
     {
         /// <inheritdoc/>
-        public DependencyContainer BuildContainer() => new();
+        public DependencyContainer BuildContainer(
+            DependencyContainerDefinition? definition = default)
+        {
+            if (definition is null)
+                return new();
+            return new(definition.ResolutionFactory);
+        }
     }
 }

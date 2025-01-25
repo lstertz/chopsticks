@@ -5,12 +5,14 @@ namespace Chopsticks.Dependencies.Factories
     /// <summary>
     /// Manages the construction of dependency containers.
     /// </summary>
-    public interface IDependencyContainerFactory<TDependencyContainer>
+    public interface IDependencyContainerFactory<TDependencyContainer, TContainerDefinition>
         where TDependencyContainer : IDependencyContainer
     {
         /// <summary>
-        /// Builds a new container.
+        /// Builds a new container, per the optional container definition.
         /// </summary>
-        TDependencyContainer BuildContainer();
+        /// <param name="definition">The optional definition that 
+        /// defines the container.</param>
+        TDependencyContainer BuildContainer(TContainerDefinition? definition = default);
     }
 }
