@@ -8,8 +8,7 @@ namespace Chopsticks.Dependencies.Containers
     /// of dependencies to be defined through the Unity hierarchy and prefabs.
     /// </summary>
     public class MonoContainer : BaseMonoContainer<DependencyContainer, 
-        UnityContainerService<DependencyContainer, DependencyContainerFactory>>
-    {
-        protected override DependencyContainer SetUp() => new();
-    }
+        DefaultDependencyContainerFactory, DependencyContainerDefinition,
+        UnityContainerService<DependencyContainer, DefaultDependencyContainerFactory,
+            DependencyContainerDefinition>> { }
 }

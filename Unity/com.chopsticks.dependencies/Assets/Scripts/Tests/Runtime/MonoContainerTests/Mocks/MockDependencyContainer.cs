@@ -8,6 +8,8 @@ namespace MonoContainerTests.Mocks
     public abstract class MockDependencyContainer :
         IDependencyContainer, IDependencyResolutionProvider, IDisposable
     {
+        public class Definition { }
+
         public abstract bool InheritParentDependencies { get; set; }
         public abstract IDependencyResolutionProvider Parent { get; set; }
 

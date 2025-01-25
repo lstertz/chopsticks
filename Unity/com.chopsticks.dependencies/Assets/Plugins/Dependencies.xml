@@ -55,6 +55,16 @@
         <member name="M:Chopsticks.Dependencies.Containers.DependencyContainer.Chopsticks#Dependencies#Resolutions#IDependencyResolutionProvider#GetResolutionsForDisposal">
             <inheritdoc/>
         </member>
+        <member name="T:Chopsticks.Dependencies.Containers.DependencyContainerDefinition">
+            <summary>
+            The definition to define the factory's produced dependency container.
+            </summary>
+        </member>
+        <member name="P:Chopsticks.Dependencies.Containers.DependencyContainerDefinition.ResolutionFactory">
+            <summary>
+            The resolution factory to be used with the dependency container.
+            </summary>
+        </member>
         <member name="T:Chopsticks.Dependencies.Containers.DependencyRegistration">
             <summary>
             Represents the registration of a dependency for a specific contract.
@@ -334,10 +344,12 @@
             </summary>
             <param name="message">The message that describes the error.</param>
         </member>
-        <member name="T:Chopsticks.Dependencies.Factories.DependencyContainerFactory">
-            <inheritdoc/>
+        <member name="T:Chopsticks.Dependencies.Factories.DefaultDependencyContainerFactory">
+            <summary>
+            Provides a default strategy to manage the construction of dependency containers.
+            </summary>
         </member>
-        <member name="M:Chopsticks.Dependencies.Factories.DependencyContainerFactory.BuildContainer">
+        <member name="M:Chopsticks.Dependencies.Factories.DefaultDependencyContainerFactory.BuildContainer(Chopsticks.Dependencies.Containers.DependencyContainerDefinition)">
             <inheritdoc/>
         </member>
         <member name="T:Chopsticks.Dependencies.Factories.DependencyResolutionFactory">
@@ -346,15 +358,17 @@
         <member name="M:Chopsticks.Dependencies.Factories.DependencyResolutionFactory.BuildResolutionFor(Chopsticks.Dependencies.Containers.DependencySpecification)">
             <inheritdoc/>
         </member>
-        <member name="T:Chopsticks.Dependencies.Factories.IDependencyContainerFactory`1">
+        <member name="T:Chopsticks.Dependencies.Factories.IDependencyContainerFactory`2">
             <summary>
             Manages the construction of dependency containers.
             </summary>
         </member>
-        <member name="M:Chopsticks.Dependencies.Factories.IDependencyContainerFactory`1.BuildContainer">
+        <member name="M:Chopsticks.Dependencies.Factories.IDependencyContainerFactory`2.BuildContainer(`1)">
             <summary>
-            Builds a new container.
+            Builds a new container, per the optional container definition.
             </summary>
+            <param name="definition">The optional definition that 
+            defines the container.</param>
         </member>
         <member name="T:Chopsticks.Dependencies.Factories.IDependencyResolutionFactory">
             <summary>

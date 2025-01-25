@@ -10,8 +10,8 @@ namespace UnityDependencyContainerServiceTests
         public void GlobalContainer_AfterReset_NewCallInstance()
         {
             // Set up
-            var service = new UnityContainerService<DependencyContainer, 
-                DependencyContainerFactory>();
+            var service = new UnityContainerService<DependencyContainer,
+                DefaultDependencyContainerFactory, DependencyContainerDefinition>();
             var firstCallContainer = service.GlobalContainer;
             service.ResetGlobal();
 
@@ -28,7 +28,7 @@ namespace UnityDependencyContainerServiceTests
         {
             // Set up
             var service = new UnityContainerService<DependencyContainer,
-                DependencyContainerFactory>();
+                DefaultDependencyContainerFactory, DependencyContainerDefinition>();
 
             // Act
             var container = service.GlobalContainer;
@@ -42,7 +42,7 @@ namespace UnityDependencyContainerServiceTests
         {
             // Set up
             var service = new UnityContainerService<DependencyContainer,
-                DependencyContainerFactory>();
+                DefaultDependencyContainerFactory, DependencyContainerDefinition>();
             var firstCallContainer = service.GlobalContainer;
 
             // Act

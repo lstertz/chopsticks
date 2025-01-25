@@ -5,10 +5,11 @@ using UnityEngine;
 
 namespace Chopsticks.Dependencies.Containers
 {
-    public class UnityContainerService<TNativeContainer, TNativeContainerFactory> : 
-        IUnityContainerService<TNativeContainer>
+    public class UnityContainerService<TNativeContainer, TNativeContainerFactory, 
+        TNativeContainerDefinition> : IUnityContainerService<TNativeContainer>
         where TNativeContainer : IDependencyContainer, IDependencyResolutionProvider, IDisposable
-        where TNativeContainerFactory : IDependencyContainerFactory<TNativeContainer>, new()
+        where TNativeContainerFactory : IDependencyContainerFactory<TNativeContainer, 
+            TNativeContainerDefinition>, new()
     {
         // TODO :: Add locking for thread safety.
 

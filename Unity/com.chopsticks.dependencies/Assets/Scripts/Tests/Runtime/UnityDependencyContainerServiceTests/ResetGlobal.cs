@@ -12,7 +12,7 @@ namespace UnityDependencyContainerServiceTests
         {
             // Set up
             var service = new UnityContainerService<MockDependencyContainer, 
-                MockDependencyContainerFactory>();
+                MockDependencyContainerFactory, MockDependencyContainer.Definition>();
             var container = service.GlobalContainer;
 
             // Act

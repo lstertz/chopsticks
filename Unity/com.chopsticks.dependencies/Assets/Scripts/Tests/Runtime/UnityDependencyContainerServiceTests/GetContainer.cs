@@ -5,7 +5,8 @@ using UnityEngine;
 
 using UnityContainerService = Chopsticks.Dependencies.Containers.UnityContainerService<
     Chopsticks.Dependencies.Containers.DependencyContainer, 
-    Chopsticks.Dependencies.Factories.DependencyContainerFactory>;
+    Chopsticks.Dependencies.Factories.DefaultDependencyContainerFactory,
+    Chopsticks.Dependencies.Containers.DependencyContainerDefinition>;
 
 namespace UnityDependencyContainerServiceTests
 {

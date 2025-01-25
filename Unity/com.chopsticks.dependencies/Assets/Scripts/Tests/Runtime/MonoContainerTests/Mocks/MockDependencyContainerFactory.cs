@@ -3,9 +3,9 @@
 namespace MonoContainerTests.Mocks
 {
     public class MockDependencyContainerFactory : 
-        IDependencyContainerFactory<MockDependencyContainer>
+        IDependencyContainerFactory<MockDependencyContainer, MockDependencyContainer.Definition>
     {
-        public MockDependencyContainer BuildContainer() => 
+        public MockDependencyContainer BuildContainer(MockDependencyContainer.Definition def) => 
             NSubstitute.Substitute.For<MockDependencyContainer>();
     }
 }

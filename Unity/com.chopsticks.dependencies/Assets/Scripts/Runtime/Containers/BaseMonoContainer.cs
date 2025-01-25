@@ -1,4 +1,5 @@
-﻿using Chopsticks.Dependencies.Resolutions;
+﻿using Chopsticks.Dependencies.Factories;
+using Chopsticks.Dependencies.Resolutions;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,31 +7,50 @@ using UnityEngine;
 namespace Chopsticks.Dependencies.Containers
 {
     /// <summary>
-    /// Designates that all child GameObject Containers/Dependencies 
-    /// are contained within this container. This enables the organization 
-    /// of dependencies to be defined through the Unity hierarchy and prefabs.
+    /// Manages the organization of MonoBehaviour containers based on the hierarchy of GameObjects.
     /// </summary>
-    /// <typeparam name="TNativeContainer">The type of the native container that manages 
-    /// the dependencies of this mono container.</typeparam>
-    public abstract class BaseMonoContainer<TNativeContainer, TUnityContainerService> : 
-        MonoBehaviour, IDependencyContainer, IUnityContainer<TNativeContainer>
+    /// <typeparam name="TNativeContainer">The type of the internal, non-Unity 
+    /// dependency container.</typeparam>
+    /// <typeparam name="TNativeContainerFactory">The factory to produce the internal, non-Unity 
+    /// dependency container.</typeparam>
+    /// <typeparam name="TNativeContainerDefinition">The type of definition to define any custom 
+    /// properties of the internal, non-Unity dependency container.</typeparam>
+    /// <typeparam name="TUnityContainerService">The type of the Unity container service that 
+    /// provides Unity-specific services.</typeparam>
+    public abstract class BaseMonoContainer<TNativeContainer, TNativeContainerFactory, 
+        TNativeContainerDefinition, TUnityContainerService> : 
+        BaseUnityContainer<TNativeContainer>
         where TNativeContainer : IDependencyContainer, IDependencyResolutionProvider, IDisposable
+        where TNativeContainerFactory : IDependencyContainerFactory<TNativeContainer, 
+            TNativeContainerDefinition>, new()
         where TUnityContainerService : IUnityContainerService<TNativeContainer>, new()
     {
+        /// <summary>
+        /// The global (highest application scope) container for all of the same type 
+        /// of MonoContainers, as defined by this container's Unity Container Service.
+        /// </summary>
         public static IDependencyContainer Global => _containerService.GlobalContainer;
-        private static readonly TUnityContainerService _containerService = new();
+
+        protected static readonly TUnityContainerService _containerService = new();
+        protected static readonly TNativeContainerFactory _containerFactory = new();
 
 
-        TNativeContainer IUnityContainer<TNativeContainer>.NativeContainer => InternalContainer;
-        protected TNativeContainer InternalContainer { get; private set; }
+        /// <inheritdoc/>
+        protected override TNativeContainer InternalContainer => 
+            _internalContainer ??= _containerFactory.BuildContainer(InternalContainerDefinition);
+        private TNativeContainer _internalContainer;
 
+        /// <summary>
+        /// The definition used, by default, to define the <see cref="InternalContainer"/>.
+        /// </summary>
+        protected virtual TNativeContainerDefinition InternalContainerDefinition { get; }
 
 
         [SerializeField]
         private bool _inheritParentDependencies;
 
         [SerializeField]
-        private BaseMonoContainer<TNativeContainer, TUnityContainerService> _overrideParent;
+        private BaseUnityContainer<TNativeContainer> _overrideParent;
 
         [SerializeField]
         private ContainerParentSetting _containerParentSetting = 
@@ -50,7 +70,6 @@ namespace Chopsticks.Dependencies.Containers
         /// </summary>
         public void Awake()
         {
-            InternalContainer = SetUp();
             InternalContainer.InheritParentDependencies = _inheritParentDependencies;
             UpdateParent();
 
@@ -58,13 +77,6 @@ namespace Chopsticks.Dependencies.Containers
 
             RegisterNativeDependencies();
         }
-
-        /// <summary>
-        /// Sets up the internal container of this mono container.
-        /// </summary>
-        /// <returns>The container that will internally manage the dependencies 
-        /// of this mono container.</returns>
-        protected abstract TNativeContainer SetUp();
 
         /// <summary>
         /// Registers any native dependencies that should be inherent to this container.
@@ -91,14 +103,14 @@ namespace Chopsticks.Dependencies.Containers
 
 
         /// <inheritdoc/>
-        public IDependencyContainer Deregister(DependencyRegistration registration)
+        public override IDependencyContainer Deregister(DependencyRegistration registration)
         {
             InternalContainer.Deregister(registration);
             return this;
         }
 
         /// <inheritdoc/>
-        public IDependencyContainer Register(DependencySpecification specification,
+        public override IDependencyContainer Register(DependencySpecification specification,
             out DependencyRegistration registration)
         {
             InternalContainer.Register(specification, out registration);
@@ -106,11 +118,11 @@ namespace Chopsticks.Dependencies.Containers
         }
 
         /// <inheritdoc/>
-        public bool Resolve(Type dependencyType, out object implementation) =>
+        public override bool Resolve(Type dependencyType, out object implementation) =>
             InternalContainer.Resolve(dependencyType, out implementation);
 
         /// <inheritdoc/>
-        public IEnumerable<object> ResolveAll(Type dependencyType) =>
+        public override IEnumerable<object> ResolveAll(Type dependencyType) =>
             InternalContainer.ResolveAll(dependencyType);
 
 

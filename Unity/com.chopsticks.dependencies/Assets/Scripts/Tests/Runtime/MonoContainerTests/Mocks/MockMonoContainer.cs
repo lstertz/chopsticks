@@ -4,17 +4,15 @@ using NSubstitute;
 namespace MonoContainerTests.Mocks
 {
     public class MockMonoContainer : 
-        BaseMonoContainer<MockDependencyContainer, MockMonoContainerService>
+        BaseMonoContainer<MockDependencyContainer, MockDependencyContainerFactory, 
+            MockDependencyContainer.Definition, MockMonoContainerService>
     {
-        public new MockDependencyContainer InternalContainer { get; set; } = 
-            Substitute.For<MockDependencyContainer>();
+        public new MockDependencyContainer InternalContainer => base.InternalContainer;
+        public MockMonoContainerService ContainerService => _containerService;
 
-        public bool RegisteredNativeDependencies { get; set; }
-
-        protected override MockDependencyContainer SetUp() => 
-            InternalContainer;
+        public bool HasRegisteredNativeDependencies { get; set; }
 
         protected override void RegisterNativeDependencies() => 
-            RegisteredNativeDependencies = true;
+            HasRegisteredNativeDependencies = true;
     }
 }

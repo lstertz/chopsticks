@@ -16,7 +16,7 @@ namespace MonoContainerTests
             var container = gameObject.AddComponent<MockMonoContainer>();
 
             // Assert
-            Assert.That(container.RegisteredNativeDependencies, Is.True);
+            Assert.That(container.HasRegisteredNativeDependencies, Is.True);
         }
     }
 }
