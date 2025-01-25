@@ -9,14 +9,13 @@ using ParentSetting = Chopsticks.Dependencies.Containers.ContainerParentSetting;
 
 namespace MonoContainerTests
 {
-    public class ContainerParentSetting
+    public class OnTransformParentChanged
     {
         [Test]
-        public void ContainerParentSetting_GlobalParentSettingOnAwake_SetsToRetrievedContainer()
+        public void OnTransformParentChanged_GlobalParentSetting_SetsToRetrievedContainer()
         {
             // Set up
             var gameObject = new GameObject();
-            gameObject.SetActive(false);
 
             var container = gameObject.AddComponent<MockMonoContainer>();
             var parentContainer = new GameObject().AddComponent<MockMonoContainer>();
@@ -25,7 +24,7 @@ namespace MonoContainerTests
             container.SetSerializedProperty("_overrideParent", parentContainer);
 
             // Act
-            gameObject.SetActive(true);
+            container.OnTransformParentChanged();
 
             // Assert
             Assert.That(container.InternalContainer.Parent, Is.Not.Null);
@@ -35,12 +34,11 @@ namespace MonoContainerTests
         }
 
         [Test]
-        public void ContainerParentSetting_HierarchyWithGlobalParentSettingOnAwake_SetsToRetrievedContainer()
+        public void OnTransformParentChanged_HierarchyWithGlobalParentSetting_SetsToRetrievedContainer()
         {
             // Set up
             var parentGameObject = new GameObject("Parent Object");
             var gameObject = new GameObject("Test Object");
-            gameObject.SetActive(false);
 
             var container = gameObject.AddComponent<MockMonoContainer>();
             var parentContainer = parentGameObject.AddComponent<MockMonoContainer>();
@@ -54,7 +52,7 @@ namespace MonoContainerTests
             container.ContainerService.Sub.ClearReceivedCalls();
 
             // Act
-            gameObject.SetActive(true);
+            container.OnTransformParentChanged();
 
             // Assert
             Assert.That(container.InternalContainer.Parent, Is.Not.Null);
@@ -64,12 +62,11 @@ namespace MonoContainerTests
         }
 
         [Test]
-        public void ContainerParentSetting_HierarchyWithoutGlobalParentSettingOnAwake_SetsToRetrievedContainer()
+        public void OnTransformParentChanged_HierarchyWithoutGlobalParentSetting_SetsToRetrievedContainer()
         {
             // Set up
             var parentGameObject = new GameObject("Parent Object");
             var gameObject = new GameObject("Test Object");
-            gameObject.SetActive(false);
 
             var container = gameObject.AddComponent<MockMonoContainer>();
             var parentContainer = parentGameObject.AddComponent<MockMonoContainer>();
@@ -81,7 +78,7 @@ namespace MonoContainerTests
             container.ContainerService.Sub.ClearReceivedCalls();
 
             // Act
-            gameObject.SetActive(true);
+            container.OnTransformParentChanged();
 
             // Assert
             Assert.That(container.InternalContainer.Parent, Is.Not.Null);
@@ -91,11 +88,10 @@ namespace MonoContainerTests
         }
 
         [Test]
-        public void ContainerParentSetting_NoneParentSettingOnAwake_SetsToNull()
+        public void OnTransformParentChanged_NoneParentSetting_SetsToNull()
         {
             // Set up
             var gameObject = new GameObject();
-            gameObject.SetActive(false);
 
             var container = gameObject.AddComponent<MockMonoContainer>();
             var parentContainer = new GameObject().AddComponent<MockMonoContainer>();
@@ -107,7 +103,7 @@ namespace MonoContainerTests
             container.ContainerService.Sub.ClearReceivedCalls();
 
             // Act
-            gameObject.SetActive(true);
+            container.OnTransformParentChanged();
 
             // Assert
             Assert.That(container.InternalContainer.Parent, Is.Null);
@@ -116,34 +112,27 @@ namespace MonoContainerTests
         }
 
         [Test]
-        public void ContainerParentSetting_OverrideParentSettingOnAwake_SetsToRetrievedContainer()
+        public void OnTransformParentChanged_OverrideParentSetting_SetsToRetrievedContainer()
         {
             // Set up
             var gameObject = new GameObject();
-            gameObject.SetActive(false);
 
             var container = gameObject.AddComponent<MockMonoContainer>();
             var parentContainer = new GameObject().AddComponent<MockMonoContainer>();
 
-            container.SetSerializedProperty("_containerParentSetting", 
+            container.SetSerializedProperty("_containerParentSetting",
                 ParentSetting.Override);
             container.SetSerializedProperty("_overrideParent", parentContainer);
 
             container.ContainerService.Sub.ClearReceivedCalls();
 
             // Act
-            gameObject.SetActive(true);
+            container.OnTransformParentChanged();
 
             // Assert
             Assert.That(container.InternalContainer.Parent, Is.Not.Null);
             container.ContainerService.Sub.Received(1).GetContainer(
                 ContainerRetrievalSetting.Override, false, container, parentContainer);
         }
-
-
-
-
-
-        // TODO :: Test for changes after creation.
     }
 }
