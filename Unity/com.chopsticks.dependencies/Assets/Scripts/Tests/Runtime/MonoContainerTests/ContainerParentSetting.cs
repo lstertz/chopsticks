@@ -11,103 +11,70 @@ namespace MonoContainerTests
 {
     public class ContainerParentSetting
     {
+
+        public class SetUp
+        {
+            public static MockMonoContainer StandardContainer(
+                ParentSetting parentSetting,
+                out GameObject containerGameObject,
+                out MockMonoContainer parentContainer,
+                out IUnityContainerService<MockDependencyContainer> serviceSub)
+            {
+                var parentGameObject = new GameObject("Parent Object");
+                containerGameObject = new GameObject("Test Object");
+                containerGameObject.SetActive(false);
+
+                var container = containerGameObject.AddComponent<MockMonoContainer>();
+                parentContainer = parentGameObject.AddComponent<MockMonoContainer>();
+
+                container.transform.parent = parentContainer.transform;
+
+                container.SetSerializedProperty("_containerParentSetting", parentSetting);
+                container.SetSerializedProperty("_overrideParent", parentContainer);
+
+                serviceSub = container.ContainerService.Sub;
+                serviceSub.ClearReceivedCalls();
+
+                return container;
+            }
+        }
+
+
         [Test]
-        public void ContainerParentSetting_GlobalParentSettingOnAwake_SetsToRetrievedContainer()
+        [TestCase(ParentSetting.Global)]
+        [TestCase(ParentSetting.HierarchyWithGlobal)]
+        [TestCase(ParentSetting.HierarchyWithoutGlobal)]
+        [TestCase(ParentSetting.Override)]
+        public void Awake_VariousParentSettings_SetsToRetrievedContainer(
+            ParentSetting parentSetting)
         {
             // Set up
-            var gameObject = new GameObject();
-            gameObject.SetActive(false);
+            var container = SetUp.StandardContainer(parentSetting,
+                out var containerGameObject, out var parentContainer, out var serviceSub);
 
-            var container = gameObject.AddComponent<MockMonoContainer>();
-            var parentContainer = new GameObject().AddComponent<MockMonoContainer>();
-
-            container.SetSerializedProperty("_containerParentSetting", ParentSetting.Global);
-            container.SetSerializedProperty("_overrideParent", parentContainer);
+            serviceSub.GetContainer(
+                (ContainerRetrievalSetting)parentSetting, false, container, parentContainer)
+                .Returns(parentContainer.InternalContainer);
 
             // Act
-            gameObject.SetActive(true);
+            containerGameObject.SetActive(true);
 
             // Assert
-            Assert.That(container.InternalContainer.Parent, Is.Not.Null);
+            Assert.That(container.InternalContainer.Parent,
+                Is.EqualTo(parentContainer.InternalContainer));
             container.ContainerService.Sub.Received(1).GetContainer(
-                ContainerRetrievalSetting.Global, false, container,
-                parentContainer);
+                (ContainerRetrievalSetting)parentSetting, false, container, parentContainer);
         }
 
         [Test]
-        public void ContainerParentSetting_HierarchyWithGlobalParentSettingOnAwake_SetsToRetrievedContainer()
+        public void Awake_NoneParentSetting_SetsToNull()
         {
             // Set up
-            var parentGameObject = new GameObject("Parent Object");
-            var gameObject = new GameObject("Test Object");
-            gameObject.SetActive(false);
-
-            var container = gameObject.AddComponent<MockMonoContainer>();
-            var parentContainer = parentGameObject.AddComponent<MockMonoContainer>();
-
-            container.transform.parent = parentContainer.transform;
-
-            container.SetSerializedProperty("_containerParentSetting",
-                ParentSetting.HierarchyWithGlobal);
-            container.SetSerializedProperty("_overrideParent", parentContainer);
-
-            container.ContainerService.Sub.ClearReceivedCalls();
+            var container = SetUp.StandardContainer(ParentSetting.None,
+                out var containerGameObject, out var parentContainer, out _);
 
             // Act
-            gameObject.SetActive(true);
-
-            // Assert
-            Assert.That(container.InternalContainer.Parent, Is.Not.Null);
-            container.ContainerService.Sub.Received(1).GetContainer(
-                ContainerRetrievalSetting.HierarchyWithGlobal, false, container,
-                parentContainer);
-        }
-
-        [Test]
-        public void ContainerParentSetting_HierarchyWithoutGlobalParentSettingOnAwake_SetsToRetrievedContainer()
-        {
-            // Set up
-            var parentGameObject = new GameObject("Parent Object");
-            var gameObject = new GameObject("Test Object");
-            gameObject.SetActive(false);
-
-            var container = gameObject.AddComponent<MockMonoContainer>();
-            var parentContainer = parentGameObject.AddComponent<MockMonoContainer>();
-
-            container.SetSerializedProperty("_containerParentSetting",
-                ParentSetting.HierarchyWithoutGlobal);
-            container.SetSerializedProperty("_overrideParent", parentContainer);
-
-            container.ContainerService.Sub.ClearReceivedCalls();
-
-            // Act
-            gameObject.SetActive(true);
-
-            // Assert
-            Assert.That(container.InternalContainer.Parent, Is.Not.Null);
-            container.ContainerService.Sub.Received(1).GetContainer(
-                ContainerRetrievalSetting.HierarchyWithoutGlobal, false, container,
-                parentContainer);
-        }
-
-        [Test]
-        public void ContainerParentSetting_NoneParentSettingOnAwake_SetsToNull()
-        {
-            // Set up
-            var gameObject = new GameObject();
-            gameObject.SetActive(false);
-
-            var container = gameObject.AddComponent<MockMonoContainer>();
-            var parentContainer = new GameObject().AddComponent<MockMonoContainer>();
-
-            container.SetSerializedProperty("_containerParentSetting",
-                ParentSetting.None);
-            container.SetSerializedProperty("_overrideParent", parentContainer);
-
-            container.ContainerService.Sub.ClearReceivedCalls();
-
-            // Act
-            gameObject.SetActive(true);
+            containerGameObject.SetActive(true);
 
             // Assert
             Assert.That(container.InternalContainer.Parent, Is.Null);
@@ -115,35 +82,90 @@ namespace MonoContainerTests
                 ContainerRetrievalSetting.Global, false, container, parentContainer);
         }
 
+
         [Test]
-        public void ContainerParentSetting_OverrideParentSettingOnAwake_SetsToRetrievedContainer()
+        [TestCase(ParentSetting.Global)]
+        [TestCase(ParentSetting.HierarchyWithGlobal)]
+        [TestCase(ParentSetting.HierarchyWithoutGlobal)]
+        [TestCase(ParentSetting.Override)]
+        public void OnTransformParentChanged_VariousParentSettings_SetsToRetrievedContainer(
+            ParentSetting parentSetting)
         {
             // Set up
-            var gameObject = new GameObject();
-            gameObject.SetActive(false);
+            var container = SetUp.StandardContainer(parentSetting,
+                out _, out var parentContainer, out var serviceSub);
 
-            var container = gameObject.AddComponent<MockMonoContainer>();
-            var parentContainer = new GameObject().AddComponent<MockMonoContainer>();
-
-            container.SetSerializedProperty("_containerParentSetting", 
-                ParentSetting.Override);
-            container.SetSerializedProperty("_overrideParent", parentContainer);
-
-            container.ContainerService.Sub.ClearReceivedCalls();
+            serviceSub.GetContainer(
+                (ContainerRetrievalSetting)parentSetting, false, container, parentContainer)
+                .Returns(parentContainer.InternalContainer);
 
             // Act
-            gameObject.SetActive(true);
+            container.OnTransformParentChanged();
 
             // Assert
-            Assert.That(container.InternalContainer.Parent, Is.Not.Null);
+            Assert.That(container.InternalContainer.Parent,
+                Is.EqualTo(parentContainer.InternalContainer));
             container.ContainerService.Sub.Received(1).GetContainer(
-                ContainerRetrievalSetting.Override, false, container, parentContainer);
+                (ContainerRetrievalSetting)parentSetting, false, container, parentContainer);
+        }
+
+        [Test]
+        public void OnTransformParentChanged_NoneParentSetting_SetsToNull()
+        {
+            // Set up
+            var container = SetUp.StandardContainer(ParentSetting.None,
+                out _, out var parentContainer, out _);
+
+            // Act
+            container.OnTransformParentChanged();
+
+            // Assert
+            Assert.That(container.InternalContainer.Parent, Is.Null);
+            container.ContainerService.Sub.DidNotReceiveWithAnyArgs().GetContainer(
+                ContainerRetrievalSetting.Global, false, container, parentContainer);
         }
 
 
+        [Test]
+        [TestCase(ParentSetting.Global)]
+        [TestCase(ParentSetting.HierarchyWithGlobal)]
+        [TestCase(ParentSetting.HierarchyWithoutGlobal)]
+        [TestCase(ParentSetting.Override)]
+        public void OnValidate_VariousParentSettings_SetsToRetrievedContainer(
+            ParentSetting parentSetting)
+        {
+            // Set up
+            var container = SetUp.StandardContainer(parentSetting,
+                out _, out var parentContainer, out var serviceSub);
 
+            serviceSub.GetContainer(
+                (ContainerRetrievalSetting)parentSetting, false, container, parentContainer)
+                .Returns(parentContainer.InternalContainer);
 
+            // Act
+            container.OnValidate();
 
-        // TODO :: Test for changes after creation.
+            // Assert
+            Assert.That(container.InternalContainer.Parent,
+                Is.EqualTo(parentContainer.InternalContainer));
+            container.ContainerService.Sub.Received(1).GetContainer(
+                (ContainerRetrievalSetting)parentSetting, false, container, parentContainer);
+        }
+
+        [Test]
+        public void OnValidate_NoneParentSetting_SetsToNull()
+        {
+            // Set up
+            var container = SetUp.StandardContainer(ParentSetting.None,
+                out _, out var parentContainer, out _);
+
+            // Act
+            container.OnValidate();
+
+            // Assert
+            Assert.That(container.InternalContainer.Parent, Is.Null);
+            container.ContainerService.Sub.DidNotReceiveWithAnyArgs().GetContainer(
+                ContainerRetrievalSetting.Global, false, container, parentContainer);
+        }
     }
 }
