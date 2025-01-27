@@ -19,9 +19,33 @@ namespace Chopsticks.Dependencies.Containers
         /// </summary>
         TNativeContainer GlobalContainer { get; }
 
+
         /// <summary>
-        /// Finds a dependency container per the specified <see cref="ContainerRetrievalSetting"/>,
-        /// starting from the given Unity container.
+        /// Finds the parent container of the given Unity container, 
+        /// per the specified <see cref="ContainerRetrievalSetting"/>.
+        /// </summary>
+        /// <typeparam name="TUnityContainer">The type of the Unity container whose 
+        /// parent will be searched for.</typeparam>
+        /// <typeparam name="TOverrideContainer">The type of the container that may 
+        /// be provided as an override, per some settings.</typeparam>
+        /// <param name="setting">The setting that defines the strategy applied 
+        /// to find the parent container.</param>
+        /// <param name="unityContainer">The Unity container whose parent will be 
+        /// searched for.</param>
+        /// <param name="overrideContainer">The wrapping Unity container of a contaienr 
+        /// that may be provided per some settings.</param>
+        /// <returns>The found parent container, or null if either no such 
+        /// container could be found or if the specified override is actually a child of the 
+        /// provided Unity container.</returns>
+        TNativeContainer FindParentContainer<TUnityContainer, TOverrideContainer>(
+            ContainerRetrievalSetting setting, TUnityContainer unityContainer, 
+            TOverrideContainer overrideContainer)
+            where TUnityContainer : MonoBehaviour, IUnityContainer<TNativeContainer>
+            where TOverrideContainer : IUnityContainer<TNativeContainer>;
+
+        /// <summary>
+        /// Provides a dependency container per the specified 
+        /// <see cref="ContainerRetrievalSetting"/>, starting from the given Unity container.
         /// </summary>
         /// <typeparam name="TUnityContainer">The type of the Unity container from 
         /// which retrieval will start, per some settings.</typeparam>

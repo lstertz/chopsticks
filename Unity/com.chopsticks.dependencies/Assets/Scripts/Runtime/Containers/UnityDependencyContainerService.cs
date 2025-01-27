@@ -20,6 +20,29 @@ namespace Chopsticks.Dependencies.Containers
         private static TNativeContainerFactory _instanceFactory = new();
 
 
+
+        /// <inheritdoc/>
+        /// <exception cref="NotSupportedException">Thrown if a  
+        /// <see cref="ContainerRetrievalSetting"/>is not supported.</exception>
+        public TNativeContainer FindParentContainer<TUnityContainer, TOverrideContainer>(
+            ContainerRetrievalSetting setting, TUnityContainer unityContainer,
+            TOverrideContainer overrideContainer)
+            where TUnityContainer : MonoBehaviour, IUnityContainer<TNativeContainer>
+            where TOverrideContainer : IUnityContainer<TNativeContainer> =>
+            setting switch
+            {
+                ContainerRetrievalSetting.HierarchyWithGlobal =>
+                    GetContainer(setting, false, unityContainer, overrideContainer),
+                ContainerRetrievalSetting.HierarchyWithoutGlobal =>
+                    GetContainer(setting, false, unityContainer, overrideContainer),
+                ContainerRetrievalSetting.Global => GlobalContainer,
+                ContainerRetrievalSetting.Override =>
+                    ValidateOverrideParent(unityContainer, overrideContainer) == null ? default : 
+                        overrideContainer.NativeContainer,
+                _ => throw new NotSupportedException($"The container retrieval setting of " +
+                                        $"{setting} is not supported."),
+            };
+
         /// <inheritdoc/>
         /// <exception cref="NotSupportedException">Thrown if a  
         /// <see cref="ContainerRetrievalSetting"/>is not supported.</exception>
@@ -39,7 +62,7 @@ namespace Chopsticks.Dependencies.Containers
                 ContainerRetrievalSetting.Global => 
                     GlobalContainer,
                 ContainerRetrievalSetting.Override => 
-                    overrideContainer.NativeContainer,
+                    overrideContainer == null ? default : overrideContainer.NativeContainer,
                 _ => throw new NotSupportedException($"The container retrieval setting of " +
                                         $"{setting} is not supported."),
             };
@@ -66,6 +89,26 @@ namespace Chopsticks.Dependencies.Containers
             }
 
             return container.NativeContainer;
+        }
+
+        private TOverrideContainer ValidateOverrideParent<TUnityContainer, TOverrideContainer>(
+            TUnityContainer child, TOverrideContainer overrideParent)
+            where TUnityContainer : IUnityContainer<TNativeContainer>
+            where TOverrideContainer : IUnityContainer<TNativeContainer>
+        {
+            if (overrideParent == null)
+                return default;
+
+            IDependencyResolutionProvider parent = overrideParent.NativeContainer;
+            while (parent != null)
+            {
+                if (parent.Equals(child.NativeContainer))
+                    return default;
+
+                parent = parent.Parent;
+            }
+
+            return overrideParent;
         }
     }
 }

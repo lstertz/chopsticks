@@ -1,10 +1,9 @@
 ﻿using Chopsticks.Dependencies.Containers;
-using TestHelpers;
 using NUnit.Framework;
 using UnityEngine;
 
 using UnityContainerService = Chopsticks.Dependencies.Containers.UnityContainerService<
-    Chopsticks.Dependencies.Containers.DependencyContainer, 
+    Chopsticks.Dependencies.Containers.DependencyContainer,
     Chopsticks.Dependencies.Factories.DefaultDependencyContainerFactory,
     Chopsticks.Dependencies.Containers.DependencyContainerDefinition>;
 
@@ -25,11 +24,6 @@ namespace UnityDependencyContainerServiceTests
                 gameObject.SetActive(false);
 
                 childContainer = gameObject.AddComponent<MonoContainer>();
-
-                // Prevent the parent container from being set during this set up.
-                childContainer.SetSerializedProperty("_containerParentSetting",
-                    ContainerParentSetting.None);
-
                 parentContainer = parentGameObject.AddComponent<MonoContainer>();
 
                 gameObject.SetActive(true);
