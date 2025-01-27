@@ -9,6 +9,10 @@ namespace Chopsticks.Dependencies.Containers
     /// <summary>
     /// Manages the organization of MonoBehaviour containers based on the hierarchy of GameObjects.
     /// </summary>
+    /// <remarks>
+    /// Instantiation of this MonoBehaviour will not automatically update the set parent container 
+    /// of any pre-existing hierarchical child containers.
+    /// </remarks>
     /// <typeparam name="TNativeContainer">The type of the internal, non-Unity 
     /// dependency container.</typeparam>
     /// <typeparam name="TNativeContainerFactory">The factory to produce the internal, non-Unity 
@@ -17,11 +21,11 @@ namespace Chopsticks.Dependencies.Containers
     /// properties of the internal, non-Unity dependency container.</typeparam>
     /// <typeparam name="TUnityContainerService">The type of the Unity container service that 
     /// provides Unity-specific services.</typeparam>
-    public abstract class BaseMonoContainer<TNativeContainer, TNativeContainerFactory, 
-        TNativeContainerDefinition, TUnityContainerService> : 
+    public abstract class BaseMonoContainer<TNativeContainer, TNativeContainerFactory,
+        TNativeContainerDefinition, TUnityContainerService> :
         BaseUnityContainer<TNativeContainer>
         where TNativeContainer : IDependencyContainer, IDependencyResolutionProvider, IDisposable
-        where TNativeContainerFactory : IDependencyContainerFactory<TNativeContainer, 
+        where TNativeContainerFactory : IDependencyContainerFactory<TNativeContainer,
             TNativeContainerDefinition>, new()
         where TUnityContainerService : IUnityContainerService<TNativeContainer>, new()
     {
@@ -36,7 +40,7 @@ namespace Chopsticks.Dependencies.Containers
 
 
         /// <inheritdoc/>
-        protected override TNativeContainer InternalContainer => 
+        protected override TNativeContainer InternalContainer =>
             _internalContainer ??= _containerFactory.BuildContainer(InternalContainerDefinition);
         private TNativeContainer _internalContainer;
 
@@ -46,14 +50,14 @@ namespace Chopsticks.Dependencies.Containers
         protected virtual TNativeContainerDefinition InternalContainerDefinition { get; }
 
 
-        [SerializeField]
+        [SerializeField]  // TODO :: Hide if the parent setting is None.
         private bool _inheritParentDependencies;
 
-        [SerializeField]
+        [SerializeField]  // TODO :: Hide if the parent setting is not Override.
         private BaseUnityContainer<TNativeContainer> _overrideParent;
 
         [SerializeField]
-        private ContainerParentSetting _containerParentSetting = 
+        private ContainerParentSetting _containerParentSetting =
             ContainerParentSetting.HierarchyWithGlobal;
 
         // TODO :: Inspector display features:
@@ -73,8 +77,6 @@ namespace Chopsticks.Dependencies.Containers
             InternalContainer.InheritParentDependencies = _inheritParentDependencies;
             UpdateParent();
 
-            // TODO :: Check whether children need to update their parent.
-
             RegisterNativeDependencies();
         }
 
@@ -87,19 +89,14 @@ namespace Chopsticks.Dependencies.Containers
         protected virtual void RegisterNativeDependencies() { }
 
 
-        public void OnDestroy() =>
+        public void OnDestroy() => 
             InternalContainer.Dispose();
-
 
         public void OnTransformParentChanged() => 
             UpdateParent();
-            
 
-        public void OnValidate()
-        {
-            // TODO :: Prevent override parent from forming a chain.
-            // TODO :: Update for inherit parent dependencies or override parent changing.
-        }
+        public void OnValidate() =>
+            UpdateParent();
 
 
         /// <inheritdoc/>
@@ -134,8 +131,17 @@ namespace Chopsticks.Dependencies.Containers
                 return;
             }
 
-            InternalContainer.Parent = _containerService.GetContainer(
-                (ContainerRetrievalSetting)_containerParentSetting, false, this, _overrideParent);
+            InternalContainer.Parent = _containerService.FindParentContainer(
+                (ContainerRetrievalSetting)_containerParentSetting, this, _overrideParent);
+
+            if (_containerParentSetting == ContainerParentSetting.Override &&
+                InternalContainer.Parent == null && _overrideParent != null)
+            {
+                Debug.LogError($"BaseMonoContainer :: Override parent was reset to 'null' " +
+                    $"on the GameObject called '{gameObject.name}' to prevent a parent loop " +
+                    $"with the GameObject called '{_overrideParent.name}'.");
+                _overrideParent = null;
+            }
         }
     }
 }
